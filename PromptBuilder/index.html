@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#6d5dfc">
+<title>Prompt Builder</title>
+<style>
+:root{--bg:#f6f5fb;--card:#fff;--text:#222;--muted:#777;--accent:#6d5dfc;--line:#e6e4ef;--danger:#d94c63}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Yu Gothic",Meiryo,sans-serif}
+header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:15px 16px}
+h1{font-size:20px;margin:0 0 4px}.sub{font-size:12px;color:var(--muted)}
+main{max-width:780px;margin:auto;padding:14px 14px 240px}
+.big{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:13px;margin-bottom:12px}
+.bighead{display:flex;align-items:center;justify-content:space-between;gap:8px}.bigtitle{font-weight:800;font-size:17px}
+.subcard{background:#fafafd;border:1px solid var(--line);border-radius:14px;padding:11px;margin-top:10px}
+.subhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px;font-weight:700}
+.tags{display:flex;flex-wrap:wrap;gap:7px}
+button{border:0;border-radius:11px;padding:9px 12px;background:#eeeef5;color:#333;font-weight:650;cursor:pointer}
+button.primary{background:var(--accent);color:#fff}.small{padding:6px 8px;font-size:12px}.danger{color:var(--danger);background:#fff0f2}
+.tag{background:#f0eeff;color:#493db2;border:1px solid #ddd8ff}.tag.selected{background:var(--accent);color:#fff}
+.add{width:100%;margin-top:9px;border:1px dashed #bbb6d5;background:transparent}
+.addSub{margin-top:10px}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 12px;z-index:4}
+.output{max-width:780px;margin:auto}.output textarea{width:100%;min-height:88px;border:1px solid var(--line);border-radius:13px;padding:10px;font:14px/1.6 inherit;resize:vertical;background:#fafafd}
+.actions{display:flex;gap:8px;margin-top:7px}.actions button{flex:1}
+input{width:100%;padding:11px;border:1px solid var(--line);border-radius:11px;font:inherit;margin:4px 0 10px}
+label{font-size:13px;font-weight:650}.hint{font-size:12px;color:var(--muted);margin:-4px 0 10px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.38);display:none;align-items:flex-end;justify-content:center;z-index:10}.modal.show{display:flex}
+.dialog{background:#fff;width:min(780px,100%);border-radius:22px 22px 0 0;padding:18px;max-height:92vh;overflow:auto}.dialog h2{font-size:18px;margin:0 0 14px}
+.variant{border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}.variant .row{display:flex;gap:7px;align-items:center}.variant input{margin:3px 0 7px}.variant button{flex:0 0 auto}
+.row{display:flex;gap:8px}.row>*{flex:1}.empty{color:var(--muted);font-size:13px}
+
+/* ===== Prompt Builder v3 ===== */
+.mode-switch-row{display:flex;align-items:center;gap:10px;margin:10px 0 14px}
+#editModeBtn{border:1px solid #d7d7df;background:#fff;color:#222;border-radius:999px;padding:9px 15px;font-size:14px;font-weight:700}
+#editModeBtn.active{background:#222;color:#fff;border-color:#222}
+#editModeStatus{font-size:12px;color:#777}
+body:not(.edit-mode) .add-btn,
+body:not(.edit-mode) .edit-btn,
+body:not(.edit-mode) .delete-btn,
+body:not(.edit-mode) [data-edit-only]{display:none!important}
+@media(max-width:600px){
+  .modal,.variant-modal,.dialog,.modal-box,.popup{
+    width:calc(100vw - 24px)!important;max-width:calc(100vw - 24px)!important;
+    max-height:82vh!important;overflow-y:auto!important;overflow-x:hidden!important;
+    box-sizing:border-box!important;margin:12px auto!important
+  }
+  .modal-content,.variant-list{width:100%!important;max-width:100%!important;box-sizing:border-box!important}
+  .variant-list{max-height:45vh;overflow-y:auto;overflow-x:hidden}
+  .variant-item,.variant-option{white-space:normal;overflow-wrap:anywhere}
+  .modal-actions{position:sticky;bottom:0;background:#fff;padding-top:10px}
+}
+
+
+/* ===== v4: edit mode / mobile variant picker ===== */
+.mode-switch-row{
+  display:flex;align-items:center;gap:10px;margin:10px 0 14px;
+}
+#editModeBtn{
+  border:1px solid #d5d5dc;background:#fff;color:#222;border-radius:999px;
+  padding:9px 15px;font-size:14px;font-weight:700;cursor:pointer;
+}
+#editModeBtn.active{background:#222;color:#fff;border-color:#222}
+#editModeStatus{font-size:12px;color:#777}
+body:not(.edit-mode) .add-btn,
+body:not(.edit-mode) .edit-btn,
+body:not(.edit-mode) .delete-btn,
+body:not(.edit-mode) [data-edit-control],
+body:not(.edit-mode) [data-edit-only]{
+  display:none!important;
+}
+@media (max-width:600px){
+  /* モーダルの背景は画面全体。白いダイアログだけを画面幅に合わせる */
+  .modal{
+    width:100vw!important;
+    max-width:none!important;
+    min-width:0!important;
+    height:100vh!important;
+    margin:0!important;
+    left:0!important;
+    right:0!important;
+    top:0!important;
+    bottom:0!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+  }
+  .dialog{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    max-height:82vh!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+    border-radius:22px 22px 0 0;
+    padding:18px 16px!important;
+  }
+  #modalBody,
+  #variants{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    overflow-x:hidden!important;
+  }
+  #variants label{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+  #variants label span{
+    flex:1 1 auto!important;
+    min-width:0!important;
+    max-width:100%!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+    word-break:break-word!important;
+  }
+  #variants .variantCheck{
+    flex:0 0 auto!important;
+    width:auto!important;
+  }
+  .modal-actions{
+    position:sticky;
+    bottom:0;
+    background:#fff;
+    padding-top:10px;
+  }
+}
+
+
+/* ===== v5: edit mode is editing-only ===== */
+body.edit-mode .bottom{display:none!important}
+body.edit-mode .tag{cursor:pointer}
+body.edit-mode body:not(.edit-mode) .tag-wrap{display:inline-flex;align-items:center;gap:4px}
+
+
+.backup-tools{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:12px 0;
+}
+.backup-tools button{
+  border:1px solid #d7d3ef;
+  background:#fff;
+  border-radius:10px;
+  padding:9px 12px;
+  font-size:14px;
+}
+
+
+.sort-handle{
+  display:none;
+  user-select:none;
+  font-size:13px;
+  opacity:.65;
+  margin-right:6px;
+}
+body.edit-mode .sortable-handle{display:inline}
+
+
+/* ===== v8: mobile-friendly reorder buttons ===== */
+.reorder-buttons{
+  display:none;
+  gap:5px;
+  margin-left:8px;
+  vertical-align:middle;
+}
+body.edit-mode .reorder-buttons{display:inline-flex}
+.reorder-buttons button{
+  min-width:34px;
+  min-height:32px;
+  padding:4px 8px;
+  border:1px solid #d7d3ef;
+  border-radius:8px;
+  background:#fff;
+  color:#493db2;
+  font-size:15px;
+  line-height:1;
+  touch-action:manipulation;
+}
+.reorder-buttons button:disabled{
+  opacity:.3;
+}
+
+
+/* v9 mobile reorder buttons */
+.reorder-buttons{display:none;gap:4px;vertical-align:middle;margin-right:4px}
+body.edit-mode .reorder-buttons{display:inline-flex}
+.reorder-btn{
+ min-width:34px;min-height:32px;padding:3px 8px;
+ border:1px solid #d7d3ef;border-radius:8px;background:#fff;
+ color:#493db2;font-size:16px;line-height:1;touch-action:manipulation;
+}
+.reorder-btn:disabled{opacity:.3}
+.head-actions{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+
+</style>
+</head>
+<body>
+<div class="mode-switch-row">
+  <button id="editModeBtn" type="button">編集モード</button>
+  <span id="editModeStatus">通常モード</span>
+</div>
+<header><h1>✨ Prompt Builder</h1><div class="sub">日本語で選んで、プロンプトを自動生成</div></header>
+<main id="app"></main>
+
+
+<div class="backup-tools" data-edit-control="true">
+  <button type="button" id="backupBtn">💾 データをバックアップ</button>
+  <button type="button" id="restoreBtn">📂 バックアップから復元</button>
+  <input type="file" id="restoreFile" accept=".json,application/json" hidden>
+</div>
+
+<div class="bottom"><div class="output">
+<div class="sub">完成したプロンプト</div>
+<textarea id="output" readonly placeholder="タグを選ぶとここに表示されます"></textarea>
+<div class="actions"><button id="clear">選択をクリア</button><button class="primary" id="copy">📋 コピー</button></div>
+</div></div>
+
+<div class="modal" id="modal"><div class="dialog">
+<h2 id="modalTitle"></h2><div id="modalBody"></div>
+<div class="actions"><button id="cancel">キャンセル</button><button class="primary" id="save">保存</button></div>
+</div></div>
+
+<script>
+const KEY="prompt_builder_v2";
+const LEGACY_KEY=Object.keys(localStorage).find(k=>k.endsWith("_prompt_builder_v2"))||null;
+
+const defaults=[
+ {id:"hair",name:"髪",subs:[
+  {id:"haircolor",name:"髪色",tags:[["黒髪",["black hair"]],["白髪",["white hair"]],["金髪",["blonde hair"]],["銀髪",["silver hair"]],["青髪",["blue hair"]]]},
+  {id:"hairstyle",name:"髪型",tags:[["ロングヘア",["long hair"]],["ショートヘア",["short hair"]],["ウルフヘア",["wolf cut","wolf hair"]],["ポニーテール",["ponytail"]],["ツインテール",["twin tails"]]]},
+  {id:"bangs",name:"前髪",tags:[["ぱっつん",["blunt bangs"]],["センターパート",["center-parted bangs"]],["斜め前髪",["side-swept bangs"]],["長い前髪",["long bangs"]]]}
+ ]},
+ {id:"face",name:"顔",subs:[
+  {id:"eyes",name:"目",tags:[["ツリ目",["upturned eyes"]],["ジト目",["half-closed eyes"]],["タレ目",["droopy eyes"]],["丸い目",["round eyes"]],["切れ長",["narrow eyes"]],["眠そうな目",["sleepy eyes"]]]},
+  {id:"expression",name:"表情",tags:[["無表情",["expressionless"]],["笑顔",["smile"]],["照れ",["blush"]],["泣き顔",["crying"]],["不機嫌",["annoyed"]]]}
+ ]},
+ {id:"clothes",name:"服装",subs:[
+  {id:"clotheskind",name:"服装",tags:[["黒スーツ",["black suit"]],["白シャツ",["white shirt"]],["パーカー",["hoodie"]],["制服",["school uniform"]]]}
+ ]}
+];
+
+let saved=JSON.parse(localStorage.getItem(KEY)||"null");
+if(!saved && LEGACY_KEY){try{saved=JSON.parse(localStorage.getItem(LEGACY_KEY)||"null");if(saved)localStorage.setItem(KEY,JSON.stringify(saved))}catch(e){}}
+let data=saved || defaults.map(c=>({
+ id:c.id,name:c.name,subs:c.subs.map(s=>({id:s.id,name:s.name,tags:s.tags.map((t,i)=>({id:s.id+"-"+i,name:t[0],variants:t[1].map((p,j)=>({id:"v"+j,prompt:p}))}))}))
+}));
+let selected=[]; // selected tag keys and variant keys
+function saveData(){localStorage.setItem(KEY,JSON.stringify(data))}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function tagKey(cid,sid,tid){return cid+"|"+sid+"|"+tid}
+function render(){
+ const app=document.getElementById("app");app.innerHTML="";
+ data.forEach((c,ci)=>{
+  const box=document.createElement("section");box.className="big";
+  box.innerHTML=`<div class="bighead">
+   <div class="bigtitle">${esc(c.name)}</div>
+   <div class="head-actions">
+    <span class="reorder-buttons" data-edit-control>
+     <button type="button" class="reorder-btn" aria-label="上へ" ${ci===0?"disabled":""} onclick="event.stopPropagation();moveCategory('${c.id}',-1)">↑</button>
+     <button type="button" class="reorder-btn" aria-label="下へ" ${ci===data.length-1?"disabled":""} onclick="event.stopPropagation();moveCategory('${c.id}',1)">↓</button>
+    </span>
+    <button class="small edit-btn" data-edit-control onclick="openCat('${c.id}')">編集</button>
+    <button class="small danger delete-btn" data-edit-control onclick="deleteCat('${c.id}')">削除</button>
+   </div>
+  </div>`;
+  c.subs.forEach((s,si)=>{
+   const sc=document.createElement("div");sc.className="subcard";
+   sc.innerHTML=`<div class="subhead">
+    <span>${esc(s.name)}</span>
+    <span class="head-actions">
+     <span class="reorder-buttons" data-edit-control>
+      <button type="button" class="reorder-btn" aria-label="上へ" ${si===0?"disabled":""} onclick="event.stopPropagation();moveSub('${c.id}','${s.id}',-1)">↑</button>
+      <button type="button" class="reorder-btn" aria-label="下へ" ${si===c.subs.length-1?"disabled":""} onclick="event.stopPropagation();moveSub('${c.id}','${s.id}',1)">↓</button>
+     </span>
+     <button class="small edit-btn" data-edit-control onclick="openSub('${c.id}','${s.id}')">編集</button>
+     <button class="small danger delete-btn" data-edit-control onclick="deleteSub('${c.id}','${s.id}')">削除</button>
+    </span>
+   </div>`;
+   const tags=document.createElement("div");tags.className="tags";
+   s.tags.forEach(t=>{
+    const wrap=document.createElement("span");wrap.className="tag-wrap";
+    const b=document.createElement("button");
+    b.className="tag small"+(selected.some(x=>x.startsWith(tagKey(c.id,s.id,t.id)+"|"))?" selected":"");
+    b.textContent=t.name;
+    b.onclick=()=>{
+      if(document.body.classList.contains("edit-mode")) openTag(c.id,s.id,t.id);
+      else toggleTag(c.id,s.id,t.id);
+    };
+    b.oncontextmenu=e=>{e.preventDefault();openTag(c.id,s.id,t.id)};
+    wrap.appendChild(b);
+    tags.appendChild(wrap);
+   });
+   if(!s.tags.length)tags.innerHTML='<div class="empty">まだタグがありません。</div>';
+   sc.appendChild(tags);
+   const add=document.createElement("button");add.className="add add-btn";add.setAttribute("data-edit-control","true");add.textContent="＋ タグを追加";add.onclick=()=>openTag(c.id,s.id);sc.appendChild(add);
+   box.appendChild(sc);
+  });
+  const addSub=document.createElement("button");addSub.className="add addSub add-btn";addSub.setAttribute("data-edit-control","true");addSub.textContent="＋ この項目に細分類を追加";addSub.onclick=()=>openSub(c.id);box.appendChild(addSub);
+  app.appendChild(box);
+ });
+ const add=document.createElement("button");add.className="add add-btn";add.setAttribute("data-edit-control","true");add.textContent="＋ 大きなカテゴリを追加";add.onclick=()=>openCat();app.appendChild(add);
+ updateOutput();
+}
+
+function moveCategory(id,dir){
+ const i=data.findIndex(c=>c.id===id); if(i<0)return;
+ const j=i+dir; if(j<0||j>=data.length)return;
+ [data[i],data[j]]=[data[j],data[i]];
+ saveData(); render();
+}
+
+function moveSub(cid,sid,dir){
+ const c=data.find(c=>c.id===cid); if(!c)return;
+ const i=c.subs.findIndex(s=>s.id===sid); if(i<0)return;
+ const j=i+dir; if(j<0||j>=c.subs.length)return;
+ [c.subs[i],c.subs[j]]=[c.subs[j],c.subs[i]];
+ saveData(); render();
+}
+
+function toggleTag(cid,sid,tid){
+ const c=data.find(x=>x.id===cid),s=c.subs.find(x=>x.id===sid),t=s.tags.find(x=>x.id===tid);
+ if(!t)return;
+ // 候補が1つだけなら選択画面を出さず、そのまま追加/解除
+ if(Array.isArray(t.variants) && t.variants.length===1){
+   const k=tagKey(cid,sid,tid)+"|"+t.variants[0].id;
+   if(selected.includes(k)) selected=selected.filter(x=>x!==k); else selected.push(k);
+   render();
+   return;
+ }
+ openVariantPicker(cid,sid,t.id);
+}
+function openVariantPicker(cid,sid,tid){
+ const c=data.find(x=>x.id===cid),s=c.subs.find(x=>x.id===sid),t=s.tags.find(x=>x.id===tid);
+ openModal("「"+t.name+"」のプロンプトを選択",`
+ <div class="hint">複数選択できます。どちらも選べば両方が出力されます。</div>
+ <div id="variants">${t.variants.map(v=>{
+   const k=tagKey(cid,sid,tid)+"|"+v.id;
+   return `<label style="display:flex;gap:8px;align-items:center;margin:9px 0">
+   <input type="checkbox" class="variantCheck" value="${esc(v.id)}" ${selected.includes(k)?"checked":""}> <span>${esc(v.prompt)}</span></label>`;
+ }).join("")}</div>
+ <button class="add add-btn" id="addVariant" data-edit-control>＋ プロンプト候補を追加</button>
+ `);
+ document.getElementById("addVariant").onclick=()=>{
+   t.variants.push({id:"v"+Date.now(),prompt:""});openVariantPicker(cid,sid,tid);
+ };
+ document.getElementById("save").onclick=()=>{
+   selected=selected.filter(x=>!x.startsWith(tagKey(cid,sid,tid)+"|"));
+   document.querySelectorAll(".variantCheck:checked").forEach(el=>selected.push(tagKey(cid,sid,tid)+"|"+el.value));
+   saveData();closeModal();render();
+ };
+}
+function updateOutput(){
+ const arr=[];
+ selected.forEach(k=>{
+  const [cid,sid,tid,vid]=k.split("|"),c=data.find(x=>x.id===cid),s=c?.subs.find(x=>x.id===sid),t=s?.tags.find(x=>x.id===tid),v=t?.variants.find(x=>x.id===vid);
+  if(v)arr.push(v.prompt);
+ });
+ document.getElementById("output").value=arr.join(", ");
+}
+function openModal(title,body){document.getElementById("modalTitle").textContent=title;document.getElementById("modalBody").innerHTML=body;document.getElementById("modal").classList.add("show")}
+function closeModal(){document.getElementById("modal").classList.remove("show")}
+document.getElementById("cancel").onclick=closeModal;
+
+function openCat(id=null){
+ const c=id&&data.find(x=>x.id===id);
+ openModal(id?"大きなカテゴリを編集":"大きなカテゴリを追加",`<label>カテゴリ名</label><input id="name" value="${esc(c?.name||"")}" placeholder="例：髪">`);
+ document.getElementById("save").onclick=()=>{
+  const n=document.getElementById("name").value.trim();if(!n)return;
+  if(c)c.name=n;else data.push({id:"c"+Date.now(),name:n,subs:[]});
+  saveData();closeModal();render();
+ };
+}
+function openSub(cid,sid=null){
+ const c=data.find(x=>x.id===cid),s=sid&&c.subs.find(x=>x.id===sid);
+ openModal(sid?"細分類を編集":"細分類を追加",`<label>細分類名</label><input id="name" value="${esc(s?.name||"")}" placeholder="例：髪型">`);
+ document.getElementById("save").onclick=()=>{
+  const n=document.getElementById("name").value.trim();if(!n)return;
+  if(s)s.name=n;else c.subs.push({id:"s"+Date.now(),name:n,tags:[]});
+  saveData();closeModal();render();
+ };
+}
+function openTag(cid,sid,tid=null){
+ const c=data.find(x=>x.id===cid),s=c.subs.find(x=>x.id===sid),t=tid&&s.tags.find(x=>x.id===tid);
+ openModal(tid?"タグを編集":"タグを追加",`
+ <label>日本語名</label><input id="tagName" value="${esc(t?.name||"")}" placeholder="例：ウルフヘア">
+ <div class="hint">登録済みのプロンプトを修正したり、候補を追加できます。通常モードでは候補を選んで使います。</div>
+ <div id="vlist">${(t?.variants||[{prompt:""}]).map((v,i)=>`
+ <div class="variant"><label>プロンプト候補 ${i+1}</label>
+ <div class="row"><input class="vp" value="${esc(v.prompt||"")}" placeholder="例：wolf cut"><button type="button" class="danger small" onclick="this.parentElement.parentElement.remove()">削除</button></div></div>`).join("")}</div>
+ <button class="add" id="addV">＋ プロンプト候補を追加</button>
+ ${tid?'<button class="danger small" id="del" style="margin-top:10px">このタグを削除</button>':""}`);
+ document.getElementById("addV").onclick=()=>{const d=document.createElement("div");d.className="variant";d.innerHTML=`<label>プロンプト候補</label><div class="row"><input class="vp" placeholder="例：wolf hair"><button type="button" class="danger small" onclick="this.parentElement.parentElement.remove()">削除</button></div>`;document.getElementById("vlist").appendChild(d)};
+ if(tid){
+  const delBtn=document.getElementById("del");
+  if(delBtn){
+    delBtn.addEventListener("click",()=>{
+      if(!confirm(`「${t.name}」を削除しますか？`)) return;
+      s.tags=s.tags.filter(x=>x.id!==tid);
+      selected=selected.filter(x=>!x.startsWith(tagKey(cid,sid,tid)+"|"));
+      saveData();
+      closeModal();
+      render();
+    });
+  }
+}
+ document.getElementById("save").onclick=()=>{
+  const name=document.getElementById("tagName").value.trim(),vs=[...document.querySelectorAll(".vp")].map(x=>x.value.trim()).filter(Boolean);if(!name||!vs.length)return;
+  const variants=vs.map((p,i)=>({id:t?.variants?.[i]?.id||"v"+Date.now()+i,prompt:p}));
+  if(t){t.name=name;t.variants=variants}else s.tags.push({id:"t"+Date.now(),name,variants});
+  saveData();closeModal();render();
+ };
+}
+function deleteCat(id){const c=data.find(x=>x.id===id);if(confirm(`「${c.name}」を削除しますか？`)){data=data.filter(x=>x.id!==id);selected=selected.filter(x=>!x.startsWith(id+"|"));saveData();render()}}
+function deleteSub(cid,sid){const c=data.find(x=>x.id===cid),s=c.subs.find(x=>x.id===sid);if(confirm(`「${s.name}」を削除しますか？`)){c.subs=c.subs.filter(x=>x.id!==sid);selected=selected.filter(x=>!x.startsWith(cid+"|"+sid+"|"));saveData();render()}}
+document.getElementById("clear").onclick=()=>{selected=[];render()};
+document.getElementById("copy").onclick=async()=>{const v=document.getElementById("output").value;if(!v)return;try{await navigator.clipboard.writeText(v);document.getElementById("copy").textContent="✓ コピーしました";setTimeout(()=>document.getElementById("copy").textContent="📋 コピー",1200)}catch(e){document.getElementById("output").select();document.execCommand("copy")}};
+render();
+
+/* ===== v6: backup / restore ===== */
+(function(){
+  const KEY = "prompt_builder_v2";
+
+  function getData(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      if(!raw) throw new Error("保存データが見つかりません");
+      return JSON.parse(raw);
+    }catch(e){
+      alert("バックアップするデータを取得できませんでした。");
+      return null;
+    }
+  }
+
+  function downloadBackup(){
+    const data = getData();
+    if(!data) return;
+    const payload = {
+      format: "Prompt Builder Backup",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      data: data
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const d = new Date();
+    const stamp =
+      d.getFullYear() +
+      String(d.getMonth()+1).padStart(2,"0") +
+      String(d.getDate()).padStart(2,"0") + "_" +
+      String(d.getHours()).padStart(2,"0") +
+      String(d.getMinutes()).padStart(2,"0");
+    a.href = url;
+    a.download = "Prompt_Backup_" + stamp + ".json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  }
+
+  function restoreBackup(file){
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(){
+      try{
+        const payload = JSON.parse(reader.result);
+        const data = payload && payload.data ? payload.data : payload;
+
+        if(!Array.isArray(data)){
+          throw new Error("形式が違います");
+        }
+
+        if(!confirm("現在の登録データを、このバックアップの内容で置き換えます。よろしいですか？")) return;
+
+        localStorage.setItem(KEY, JSON.stringify(data));
+        location.reload();
+      }catch(e){
+        alert("バックアップファイルを読み込めませんでした。Prompt Builderで作成したJSONか確認してください。");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    const backupBtn = document.getElementById("backupBtn");
+    const restoreBtn = document.getElementById("restoreBtn");
+    const restoreFile = document.getElementById("restoreFile");
+
+    if(backupBtn) backupBtn.addEventListener("click", downloadBackup);
+    if(restoreBtn) restoreBtn.addEventListener("click", ()=>restoreFile && restoreFile.click());
+    if(restoreFile) restoreFile.addEventListener("change", e=>{
+      restoreBackup(e.target.files && e.target.files[0]);
+      e.target.value = "";
+    });
+  });
+})();
+</script>
+
+
+
+
+<script>
+(function(){
+  const btn=document.getElementById('editModeBtn');
+  const status=document.getElementById('editModeStatus');
+  function setMode(on){
+    document.body.classList.toggle('edit-mode',on);
+    btn.classList.toggle('active',on);
+    btn.textContent=on?'編集モード終了':'編集モード';
+    status.textContent=on?'編集・追加・削除ができます':'通常モード';
+  }
+  setMode(false);
+  btn.addEventListener('click',()=>setMode(!document.body.classList.contains('edit-mode')));
+})();
+</script>
+
+</body>
+</html>
