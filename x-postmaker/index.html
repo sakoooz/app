@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <title>Talelynx X投稿画像メーカー</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <section class="controls">
+      <h1>Talelynx X投稿画像メーカー</h1>
+
+      <label>カラーテーマ
+        <select id="theme">
+          <option value="seashore">Seashore</option>
+          <option value="nightcities">NightCities</option>
+          <option value="flowers">Flowers</option>
+          <option value="teacups">Teacups</option>
+          <option value="cleancities">CleanCities</option>
+          <option value="ayame">Ayame</option>
+          <option value="basketgoal">BasketGoal</option>
+          <option value="pistachio">Pistachio</option>
+          <option value="greenapple">GreenApple</option>
+          <option value="cyberpunk">Cyberpunk</option>
+          <option value="purplesmoke">PurpleSmoke</option>
+          <option value="berrychocolate">BerryChocolate</option>
+        </select>
+      </label>
+
+      <label>サービス名
+        <input id="serviceName" value="Talelynx">
+      </label>
+
+      <label>作品URL
+        <input id="workUrl" value="https://talelynx.ai/">
+      </label>
+
+      <label>QRコード
+        <input id="qrInput" type="file" accept="image/png,image/jpeg,image/webp">
+      </label>
+
+      <label>作品タイトル
+        <input id="title" value="作品タイトル">
+      </label>
+
+      <label>作品ジャンル
+        <input id="genre" value="作品ジャンル">
+      </label>
+
+      <label>作品紹介文
+        <textarea id="description" rows="3">作品紹介文を記入</textarea>
+      </label>
+
+      <label>キャラクター名
+        <input id="characterName" value="田中 太郎">
+      </label>
+
+      <label>キャラ紹介
+        <textarea id="characterDescription" rows="3">キャラ紹介文を記入</textarea>
+      </label>
+
+      <label>タグ（カンマ区切り）
+        <input id="tags" value="#タグ1, #タグ2, #タグ3">
+      </label>
+
+      <label>キャッチコピー
+        <input id="catchcopy" value="キャッチコピー">
+      </label>
+
+      <label>画像
+        <input id="imageInput" type="file" accept="image/*">
+      </label>
+
+      <fieldset class="image-controls">
+        <legend>画像調整</legend>
+
+        <label>拡大・縮小
+          <input id="imageZoom" type="range" min="100" max="300" value="100" step="1">
+          <span id="zoomValue">100%</span>
+        </label>
+
+        <label>左右位置
+          <input id="imageX" type="range" min="-100" max="100" value="0" step="1">
+          <span id="xValue">0</span>
+        </label>
+
+        <label>上下位置
+          <input id="imageY" type="range" min="-100" max="100" value="0" step="1">
+          <span id="yValue">0</span>
+        </label>
+
+        <button id="resetImage" type="button" class="secondary-button">画像位置・倍率をリセット</button>
+        <p class="drag-hint">プレビューの画像をドラッグして移動できます。</p>
+      </fieldset>
+
+      <button id="download" type="button">PNG画像を書き出す</button>
+      <p id="status" aria-live="polite"></p>
+    </section>
+
+    <section class="preview-area">
+      <div class="preview-frame">
+        <canvas id="canvas" width="1200" height="675"></canvas>
+      </div>
+      <p class="hint">1200 × 675 px（16:9）で書き出します。</p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
