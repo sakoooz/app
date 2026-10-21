@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#638c2b">
+  <title>キーワード設計シート</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="icon" href="../assets/apple-touch-icon.png" sizes="any">
+  <link rel="icon" type="image/png" href="../assets/favicon.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <style>
+    .keyword-list { display:grid; gap:16px; }
+    .keyword-card { min-width:0; padding:clamp(16px,2.5vw,22px); border:1px solid var(--color-line); border-radius:18px; background:#fdfdfb; }
+    .keyword-card-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
+    .keyword-card-title { margin:0; font-size:15px; font-weight:800; color:var(--color-primary-dark); }
+    .keyword-card-fields { display:grid; gap:16px; }
+    .keyword-chips { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; }
+    .keyword-chips input { min-width:0; }
+    .field-hint { color:var(--color-muted); font-size:11px; line-height:1.6; }
+    .content-label-row { display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+    .char-count { color:var(--color-muted); font-size:11px; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    .char-count.is-full { color:#a14e3f; font-weight:800; }
+    .keyword-content { min-height:140px; }
+    .keyword-actions { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:18px; }
+    .add-keyword-group { display:grid; place-items:center; width:54px; height:54px; padding:0; border:1px solid var(--color-line); border-radius:50%; color:white; background:var(--color-primary); box-shadow:0 5px 16px rgba(43,52,36,.13); font-size:30px; line-height:1; }
+    .add-keyword-group:hover { background:var(--color-primary-dark); }
+    .remove-group { flex:0 0 auto; padding:7px 10px; border:1px solid #eadbd6; border-radius:10px; color:#8b5c51; background:#fff; font-size:11px; }
+    .group-move-actions { display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+    .move-group { flex:0 0 auto; min-width:34px; min-height:32px; padding:5px 9px; border:1px solid var(--color-line); border-radius:9px; color:var(--color-ink); background:#fff; font-size:14px; }
+    .move-group:disabled { opacity:.35; cursor:not-allowed; }
+    .group-count { color:var(--color-muted); font-size:12px; }
+    .empty-note { color:var(--color-muted); font-size:12px; line-height:1.8; }
+    @media(max-width:720px) { .keyword-chips { grid-template-columns:repeat(2,minmax(0,1fr)); } .keyword-chips input:last-child:nth-child(odd) { grid-column:1/-1; } .keyword-card-head { align-items:flex-start; } .keyword-content { min-height:120px; } }
+    @media(max-width:380px) { .keyword-chips { grid-template-columns:minmax(0,1fr); } .keyword-chips input:last-child:nth-child(odd) { grid-column:auto; } }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="app-header">
+    <div class="brand-mark" aria-hidden="true">⌘</div>
+    <div class="header-copy">
+      <p class="eyebrow">WORLD-BUILDING WORKSHEET</p>
+      <h1>キーワード設計シート</h1>
+      <p class="header-description">世界を形づくる言葉と設定を、思いついた順に書き留める。</p>
+    </div>
+  </header>
+
+  <button type="button" class="toolbar-toggle" id="toolbar-toggle" aria-label="シート操作を開く" aria-expanded="false" aria-controls="sheet-toolbar">
+    <span class="toolbar-toggle-icon" aria-hidden="true">↗</span>
+  </button>
+
+  <div class="toolbar toolbar-panel" id="sheet-toolbar" aria-label="シート操作" aria-hidden="true">
+    <div class="character-manager">
+      <label class="character-select-label" for="sheet-select">保存済みシート</label>
+      <select id="sheet-select" aria-label="編集するシートを選択"></select>
+      <span id="sheet-count" class="character-count"></span>
+    </div>
+    <div class="toolbar-status" id="save-status" aria-live="polite">このブラウザに自動保存します</div>
+    <div class="toolbar-actions">
+      <button type="button" class="button button-soft" id="new-sheet">新規シート</button>
+      <button type="button" class="button button-soft" id="duplicate-sheet">複製</button>
+      <button type="button" class="button button-soft" id="delete-sheet">削除</button>
+      <button type="button" class="button button-soft" id="import-json">JSON読み込み</button>
+      <button type="button" class="button button-primary" id="export-json">JSON書き出し</button>
+      <button type="button" class="button button-primary" id="copy-markdown">Markdownをコピー</button>
+      <button type="button" class="button button-soft" id="export-markdown">.md保存</button>
+      <input type="file" id="json-file" accept=".json,application/json" hidden>
+    </div>
+  </div>
+
+  <main>
+    <section class="panel" aria-labelledby="intro-heading">
+      <div class="section-heading">
+        <span class="section-number">01</span>
+        <h2 id="intro-heading">世界観メモ</h2>
+      </div>
+      <div class="field-grid">
+        <label class="field"><span class="field-label">作品・世界の名前（任意）</span><input type="text" id="world-title" placeholder="例：作品名・世界名"></label>
+        <label class="field"><span class="field-label">全体メモ（任意）</span><input type="text" id="world-note" placeholder="方向性や思いつきなど"></label>
+      </div>
+      <p class="empty-note">分類は自由に付けられます。用語集・世界の法則・場所・歴史・現象など、必要なまとまりを好きな順番で追加してください。</p>
+    </section>
+
+    <section class="panel" aria-labelledby="keywords-heading">
+      <div class="section-heading">
+        <span class="section-number">02</span>
+        <h2 id="keywords-heading">キーワード群</h2>
+      </div>
+      <div id="keyword-list" class="keyword-list"></div>
+      <div class="keyword-actions">
+        <button type="button" class="add-keyword-group" id="add-group" aria-label="キーワード群を追加" title="キーワード群を追加">＋</button>
+      </div>
+      <p id="group-limit-note" class="empty-note" aria-live="polite" style="text-align:center;margin:10px 0 0">キーワード群は最大50個まで追加できます。</p>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>入力内容はこのブラウザ内に保存されます。大切なデータはJSONまたはMarkdownでもバックアップしてください。</p>
+    <button type="button" class="text-button" id="clear-sheet">このシートの入力をすべて消去</button>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<template id="keyword-template">
+  <article class="keyword-card">
+    <div class="keyword-card-head">
+      <h3 class="keyword-card-title">キーワード群</h3>
+      <div class="group-move-actions">
+        <button type="button" class="move-group move-up" aria-label="このキーワード群を上へ移動" title="上へ移動">↑</button>
+        <button type="button" class="move-group move-down" aria-label="このキーワード群を下へ移動" title="下へ移動">↓</button>
+        <button type="button" class="remove-group">この群を削除</button>
+      </div>
+    </div>
+    <div class="keyword-card-fields">
+      <label class="field">
+        <span class="field-label">キーワードの分類</span>
+        <input type="text" data-role="category" placeholder="例：世界名、地名、専門用語">
+      </label>
+      <div class="field">
+        <span class="field-label">キーワード（最大5個）</span>
+        <div class="keyword-chips">
+          <input type="text" data-role="keyword" aria-label="キーワード1" placeholder="キーワード1">
+          <input type="text" data-role="keyword" aria-label="キーワード2" placeholder="キーワード2">
+          <input type="text" data-role="keyword" aria-label="キーワード3" placeholder="キーワード3">
+          <input type="text" data-role="keyword" aria-label="キーワード4" placeholder="キーワード4">
+          <input type="text" data-role="keyword" aria-label="キーワード5" placeholder="キーワード5">
+        </div>
+        <span class="field-hint">関連する用語や概念を、必要な分だけ入力。</span>
+      </div>
+      <label class="field">
+        <span class="content-label-row"><span class="field-label">キーワードの内容</span><span class="char-count">0文字</span></span>
+        <textarea class="keyword-content" data-role="content" rows="5" placeholder="この分類やキーワードについての設定、定義、ルール、補足など"></textarea>
+      </label>
+    </div>
+  </article>
+</template>
+
+<script>
+(() => {
+  "use strict";
+  const STORAGE_KEY = "keywordDesignSheet.multi.v1";
+  const MAX_GROUPS = 50;
+  const GUIDELINE_CONTENT = 400;
+  const list = document.getElementById("keyword-list");
+  const template = document.getElementById("keyword-template");
+  const select = document.getElementById("sheet-select");
+  const sheetCount = document.getElementById("sheet-count");
+  const status = document.getElementById("save-status");
+  const toast = document.getElementById("toast");
+  const jsonFile = document.getElementById("json-file");
+  const titleInput = document.getElementById("world-title");
+  const noteInput = document.getElementById("world-note");
+  const addButton = document.getElementById("add-group");
+  const limitNote = document.getElementById("group-limit-note");
+  const toolbarToggle = document.getElementById("toolbar-toggle");
+  const toolbarPanel = document.getElementById("sheet-toolbar");
+  let store = { activeId: null, sheets: [] };
+  let activeId = null;
+  let switching = false;
+  let saveTimer = null;
+  let toastTimer = null;
+
+  const uid = () => "world-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+  const blankGroup = () => ({ category: "", keywords: ["", "", "", "", ""], content: "" });
+  const blankData = () => ({ title: "", note: "", groups: [blankGroup(), blankGroup()] });
+  const currentSheet = () => store.sheets.find(s => s.id === activeId) || null;
+
+  function setToolbarOpen(open) {
+    toolbarPanel.classList.toggle("is-open", open);
+    toolbarPanel.setAttribute("aria-hidden", String(!open));
+    toolbarToggle.setAttribute("aria-expanded", String(open));
+    toolbarToggle.setAttribute("aria-label", open ? "シート操作を閉じる" : "シート操作を開く");
+    toolbarToggle.innerHTML = '<span class="toolbar-toggle-icon" aria-hidden="true">' + (open ? "×" : "↗") + '</span>';
+  }
+  toolbarToggle.addEventListener("click", () => setToolbarOpen(!toolbarPanel.classList.contains("is-open")));
+  document.addEventListener("keydown", e => { if (e.key === "Escape") setToolbarOpen(false); });
+  document.addEventListener("click", e => {
+    if (toolbarPanel.classList.contains("is-open") && !toolbarPanel.contains(e.target) && !toolbarToggle.contains(e.target)) setToolbarOpen(false);
+  });
+
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("is-visible");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 2400);
+  }
+  function setStatus(message) { status.textContent = message; }
+  function sheetName(sheet) { return (sheet.data.title || "").trim() || "名前未設定"; }
+
+  function readForm() {
+    const groups = [...list.querySelectorAll(".keyword-card")].map(card => ({
+      category: card.querySelector('[data-role="category"]').value,
+      keywords: [...card.querySelectorAll('[data-role="keyword"]')].map(input => input.value),
+      content: card.querySelector('[data-role="content"]').value
+    }));
+    return { title: titleInput.value, note: noteInput.value, groups };
+  }
+  function updateCount(card) {
+    const textarea = card.querySelector('[data-role="content"]');
+    const count = card.querySelector(".char-count");
+    const length = [...textarea.value].length;
+    count.textContent = length + "文字" + (length > GUIDELINE_CONTENT ? "（目安400文字を超過）" : "（目安400文字）");
+    count.classList.toggle("is-full", length > GUIDELINE_CONTENT);
+  }
+  function renumberGroups() {
+    [...list.querySelectorAll(".keyword-card")].forEach((card, i) => {
+      card.querySelector(".keyword-card-title").textContent = "キーワード群 " + String(i + 1).padStart(2, "0");
+      card.querySelector(".remove-group").disabled = list.children.length <= 1;
+      card.querySelector(".move-up").disabled = i === 0;
+      card.querySelector(".move-down").disabled = i === list.children.length - 1;
+    });
+    addButton.disabled = list.children.length >= MAX_GROUPS;
+    addButton.style.opacity = addButton.disabled ? ".45" : "1";
+    addButton.style.cursor = addButton.disabled ? "not-allowed" : "pointer";
+    limitNote.textContent = list.children.length >= MAX_GROUPS
+      ? "上限の50群に達しています。追加するには既存の群を削除してください。"
+      : "現在 " + list.children.length + " / " + MAX_GROUPS + " 群。＋ボタンで追加できます。";
+  }
+  function moveGroup(card, direction) {
+    const cards = [...list.querySelectorAll(".keyword-card")];
+    const index = cards.indexOf(card);
+    const targetIndex = index + direction;
+    if (index < 0 || targetIndex < 0 || targetIndex >= cards.length) return;
+    if (direction < 0) {
+      list.insertBefore(card, cards[targetIndex]);
+    } else {
+      list.insertBefore(cards[targetIndex], card);
+    }
+    renumberGroups();
+    scheduleSave();
+  }
+  function addGroup(data = blankGroup()) {
+    if (list.children.length >= MAX_GROUPS) return;
+    const card = template.content.firstElementChild.cloneNode(true);
+    card.querySelector('[data-role="category"]').value = data.category || "";
+    const keywordInputs = [...card.querySelectorAll('[data-role="keyword"]')];
+    keywordInputs.forEach((input, i) => input.value = (data.keywords || [])[i] || "");
+    const textarea = card.querySelector('[data-role="content"]');
+    textarea.value = data.content || "";
+    textarea.addEventListener("input", () => { updateCount(card); scheduleSave(); });
+    card.querySelectorAll("input").forEach(input => input.addEventListener("input", scheduleSave));
+    card.querySelector(".remove-group").addEventListener("click", () => {
+      if (list.children.length <= 1) return;
+      card.remove(); renumberGroups(); scheduleSave();
+    });
+    card.querySelector(".move-up").addEventListener("click", () => moveGroup(card, -1));
+    card.querySelector(".move-down").addEventListener("click", () => moveGroup(card, 1));
+    updateCount(card);
+    list.appendChild(card);
+    renumberGroups();
+  }
+  function writeForm(data) {
+    switching = true;
+    titleInput.value = data.title || "";
+    noteInput.value = data.note || "";
+    list.innerHTML = "";
+    const groups = Array.isArray(data.groups) && data.groups.length ? data.groups.slice(0, MAX_GROUPS) : [blankGroup(), blankGroup()];
+    groups.forEach(group => addGroup(group));
+    renumberGroups();
+    switching = false;
+  }
+  function updateSelector() {
+    select.innerHTML = "";
+    store.sheets.forEach(sheet => {
+      const option = document.createElement("option");
+      option.value = sheet.id;
+      option.textContent = sheetName(sheet);
+      select.appendChild(option);
+    });
+    if (activeId) select.value = activeId;
+    sheetCount.textContent = store.sheets.length + " 件保存中";
+  }
+  function persist() {
+    try {
+      store.activeId = activeId;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+      setStatus("自動保存済み · " + new Date().toLocaleTimeString("ja-JP", {hour:"2-digit", minute:"2-digit"}));
+      updateSelector();
+    } catch (e) { setStatus("保存できません。JSONでバックアップしてください"); }
+  }
+  function saveNow() {
+    const sheet = currentSheet();
+    if (!sheet) return;
+    sheet.data = readForm();
+    sheet.updatedAt = new Date().toISOString();
+    persist();
+  }
+  function scheduleSave() {
+    if (switching) return;
+    setStatus("保存中…");
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveNow, 250);
+  }
+  function saveBeforeSwitch() { clearTimeout(saveTimer); saveNow(); }
+  function createSheet(data = blankData()) {
+    const sheet = { id: uid(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), data: JSON.parse(JSON.stringify(data)) };
+    store.sheets.push(sheet);
+    activeId = sheet.id;
+    writeForm(sheet.data);
+    persist();
+    updateSelector();
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+  function loadSheet(id) {
+    const sheet = store.sheets.find(s => s.id === id);
+    if (!sheet) return;
+    activeId = id;
+    writeForm(sheet.data || blankData());
+    persist();
+    setStatus("「" + sheetName(sheet) + "」を編集中");
+  }
+  function safeFilename(value) {
+    return (value || "keyword-design-sheet").trim().replace(/[\\/:*?"<>|]/g, "-").replace(/\s+/g, "-").slice(0,70) || "keyword-design-sheet";
+  }
+  function download(filename, content, type) {
+    const blob = new Blob([content], {type});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
+  function buildMarkdown() {
+    const data = readForm();
+    const lines = [];
+    if (data.title.trim()) lines.push("# " + data.title.trim());
+    if (data.note.trim()) { if (lines.length) lines.push(""); lines.push("メモ：" + data.note.trim()); }
+    data.groups.forEach((group, i) => {
+      const keywords = group.keywords.map(v => v.trim()).filter(Boolean);
+      const content = group.content.trim();
+      if (!group.category.trim() && !keywords.length && !content) return;
+      if (lines.length) lines.push("");
+      lines.push("## " + (group.category.trim() || "キーワード群 " + (i + 1)));
+      if (keywords.length) lines.push(keywords.join(", "));
+      if (keywords.length && content) lines.push("");
+      if (content) lines.push(content);
+    });
+    return lines.join("\n").trim();
+  }
+  async function copyMarkdown() {
+    const text = buildMarkdown();
+    if (!text) { showToast("まだ入力内容がありません"); return; }
+    try { await navigator.clipboard.writeText(text); showToast("Markdownをコピーしました"); }
+    catch (e) {
+      const temp = document.createElement("textarea");
+      temp.value = text; temp.setAttribute("readonly",""); temp.style.position="fixed"; temp.style.opacity="0";
+      document.body.appendChild(temp); temp.select();
+      const copied = document.execCommand("copy"); temp.remove();
+      showToast(copied ? "Markdownをコピーしました" : "コピーできませんでした。.md保存をお試しください");
+    }
+  }
+  function exportMarkdown() {
+    const text = buildMarkdown();
+    if (!text) { showToast("まだ入力内容がありません"); return; }
+    download(safeFilename(readForm().title) + ".md", text, "text/markdown;charset=utf-8");
+    showToast("Markdownファイルを書き出しました");
+  }
+  function exportJSON() {
+    saveBeforeSwitch();
+    const sheet = currentSheet();
+    const payload = { app:"キーワード設計シート", version:1, exportedAt:new Date().toISOString(), data:readForm() };
+    download(safeFilename(sheet && sheet.data.title) + ".json", JSON.stringify(payload,null,2), "application/json;charset=utf-8");
+    showToast("JSONを書き出しました");
+  }
+  titleInput.addEventListener("input", scheduleSave);
+  noteInput.addEventListener("input", scheduleSave);
+  addButton.addEventListener("click", () => {
+    if (list.children.length >= MAX_GROUPS) { showToast("キーワード群は最大50個です"); return; }
+    addGroup(); scheduleSave();
+    list.lastElementChild.scrollIntoView({behavior:"smooth", block:"center"});
+    list.lastElementChild.querySelector('[data-role="category"]').focus({preventScroll:true});
+  });
+  select.addEventListener("change", () => { saveBeforeSwitch(); loadSheet(select.value); showToast("シートを切り替えました"); });
+  document.getElementById("new-sheet").addEventListener("click", () => { saveBeforeSwitch(); createSheet(); showToast("新しいシートを作成しました"); });
+  document.getElementById("duplicate-sheet").addEventListener("click", () => {
+    saveBeforeSwitch();
+    const data = readForm();
+    data.title = data.title.trim() ? data.title.trim() + "（コピー）" : "";
+    createSheet(data); showToast("シートを複製しました");
+  });
+  document.getElementById("delete-sheet").addEventListener("click", () => {
+    const sheet = currentSheet();
+    if (!sheet || !confirm("「" + sheetName(sheet) + "」を削除しますか？\nこの操作は元に戻せません。")) return;
+    store.sheets = store.sheets.filter(s => s.id !== activeId);
+    if (!store.sheets.length) createSheet();
+    else { activeId = store.sheets[0].id; writeForm(store.sheets[0].data); persist(); }
+    updateSelector(); showToast("シートを削除しました");
+  });
+  document.getElementById("export-json").addEventListener("click", exportJSON);
+  document.getElementById("copy-markdown").addEventListener("click", copyMarkdown);
+  document.getElementById("export-markdown").addEventListener("click", exportMarkdown);
+  document.getElementById("import-json").addEventListener("click", () => jsonFile.click());
+  jsonFile.addEventListener("change", () => {
+    const file = jsonFile.files && jsonFile.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result));
+        const data = parsed && parsed.data ? parsed.data : parsed;
+        if (!data || typeof data !== "object" || !Array.isArray(data.groups)) throw new Error("invalid");
+        if (!confirm("JSONの内容を新しいシートとして追加します。よろしいですか？")) return;
+        saveBeforeSwitch(); createSheet(data); showToast("JSONを読み込みました");
+      } catch (e) { alert("読み込めませんでした。キーワード設計シートのJSONファイルを選んでください。"); }
+      finally { jsonFile.value = ""; }
+    };
+    reader.onerror = () => alert("ファイルを読み込めませんでした。");
+    reader.readAsText(file, "utf-8");
+  });
+  document.getElementById("clear-sheet").addEventListener("click", () => {
+    const sheet = currentSheet();
+    if (!sheet || !confirm("「" + sheetName(sheet) + "」の入力をすべて消去しますか？")) return;
+    writeForm(blankData()); saveNow(); window.scrollTo({top:0,behavior:"smooth"}); showToast("入力を消去しました");
+  });
+
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.sheets) && parsed.sheets.length) store = parsed;
+    }
+  } catch (e) { store = {activeId:null, sheets:[]}; }
+  if (!store.sheets.length) {
+    const first = {id:uid(), createdAt:new Date().toISOString(), updatedAt:new Date().toISOString(), data:blankData()};
+    store = {activeId:first.id, sheets:[first]};
+  }
+  activeId = store.activeId && store.sheets.some(s => s.id === store.activeId) ? store.activeId : store.sheets[0].id;
+  writeForm((currentSheet() || store.sheets[0]).data || blankData());
+  updateSelector();
+  persist();
+})();
+</script>
+</body>
+</html>
