@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Talelynx HTML Builder</title>
+<style>
+:root{color-scheme:dark;--bg:#171719;--panel:#222226;--panel2:#2b2b31;--line:#414149;--text:#f4f1f5;--muted:#aaa6b0;--accent:#9fc762;--accentText:#241b1c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif}
+header{padding:20px 24px 17px;border-bottom:1px solid var(--line);background:#1d1d20}
+h1{font-size:21px;margin:0 0 4px}header p{margin:0;color:var(--muted);font-size:12px}
+main{display:grid;grid-template-columns:300px minmax(0,1fr);gap:14px;padding:14px;max-width:1600px;margin:auto}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:13px;overflow:hidden;min-width:0}
+.panel-head{padding:12px 15px;background:var(--panel2);border-bottom:1px solid var(--line);font-weight:750}
+.panel-body{padding:14px}
+.category{font-size:11px;color:var(--accent);font-weight:800;letter-spacing:.06em;margin:14px 0 7px}
+.category:first-child{margin-top:0}
+.palette{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.palette button{border:1px solid #4a4a54;border-radius:8px;background:#33333a;color:var(--text);padding:9px 8px;text-align:left;font:inherit;font-size:12px;cursor:pointer}
+.palette button:hover{border-color:var(--accent);background:#3b3438}
+.palette button small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+.hint{font-size:11px;color:var(--muted);margin:9px 0 0}
+.editor-top{display:flex;gap:7px;flex-wrap:wrap;padding:10px 12px;border-bottom:1px solid var(--line)}
+button.action{border:1px solid #555560;border-radius:8px;padding:8px 11px;background:#35353d;color:var(--text);font:inherit;font-size:12px;font-weight:650;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accentText)}
+button.action:hover{filter:brightness(1.1)}
+textarea{display:block;width:100%;resize:vertical;border:0;outline:none;background:#141416;color:#f3edf5;padding:15px;font:12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;tab-size:2;white-space:pre;min-height:390px}
+.editor-label{padding:8px 14px;color:var(--muted);font-size:11px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}
+.preview-head{padding:10px 14px;border-top:1px solid var(--line);background:var(--panel2);font-size:12px;font-weight:750;display:flex;justify-content:space-between;align-items:center}
+#preview{min-height:180px;background:#ffffff;color:#000000;padding:18px;overflow-wrap:anywhere;line-height:normal}
+#preview details{margin:8px 0}
+#preview summary{cursor:pointer}
+#preview .builder-line-h{height:0}
+#preview .builder-line-v{display:inline-block;vertical-align:middle}
+#preview ul,#preview ol{padding-left:24px}
+#preview blockquote{margin:12px 0;padding:8px 14px;border-left:3px solid #b8a0a2}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.controls label{display:block;font-size:11px;color:#e1dce4;font-weight:650}
+.controls input,.controls select,.controls textarea{width:100%;margin-top:4px;background:#17171a;color:var(--text);border:1px solid #4b4b55;border-radius:7px;padding:8px;font:inherit;font-size:12px;min-height:34px}
+.controls input[type=color]{padding:3px;height:34px}
+.controls input[type=checkbox]{width:auto;min-height:0;vertical-align:middle}
+.wide{grid-column:1/-1}
+#settings{border-top:1px solid var(--line);padding-top:13px;margin-top:13px}
+.status{min-height:18px;color:var(--accent);font-size:11px;margin-top:9px}
+@media(max-width:850px){main{grid-template-columns:1fr;padding:8px}header{padding:17px}.palette{grid-template-columns:repeat(3,1fr)}textarea{min-height:300px}}
+</style>
+</head>
+<body>
+<header>
+<h1>Talelynx HTML Builder</h1>
+<p>要素を選んでカーソル位置に挿入。HTMLは直接編集でき、プレビューで確認できます。</p>
+</header>
+<main>
+<section class="panel">
+<div class="panel-head">要素を挿入</div>
+<div class="panel-body">
+<div class="category">01 / DIV</div>
+<div class="palette">
+<button data-insert="div">div<small>通常のブロック</small></button>
+<button data-insert="divbox">div（囲み枠）<small>背景・枠線つき</small></button>
+</div>
+<div class="category">02 / HEADINGS</div>
+<div class="palette">
+<button data-insert="h1">H1<small>大見出し</small></button>
+<button data-insert="h2">H2<small>見出し</small></button>
+<button data-insert="h3">H3<small>小見出し</small></button>
+<button data-insert="h4">H4<small>小見出し</small></button>
+</div>
+<div class="category">03 / TEXT</div>
+<div class="palette">
+<button data-insert="p">p<small>段落</small></button>
+<button data-insert="span">span<small>インライン文字</small></button>
+<button data-insert="blockquote">blockquote<small>引用・強調</small></button>
+</div>
+<div class="category">04 / DISCLOSURE</div>
+<div class="palette">
+<button data-insert="details">開閉パネル<small>summary + 本文</small></button>
+</div>
+<div class="category">05 / LINES</div>
+<div class="palette">
+<button data-insert="lineh">横線<small>長さ・太さ・色</small></button>
+<button data-insert="linev">縦線<small>長さ・太さ・色</small></button>
+</div>
+<div class="category">06 / LISTS</div>
+<div class="palette">
+<button data-insert="ul">ul<small>箇条書き</small></button>
+<button data-insert="ol">ol<small>番号付きリスト</small></button>
+<button data-insert="li">li<small>リスト項目</small></button>
+</div>
+<p class="hint">HTML欄にカーソルを置いてから要素を選ぶと、その位置に挿入します。divの中にdivや文章要素を入れるときは、開始タグと終了タグの間にカーソルを置いてね。</p>
+<div id="settings">
+<div class="category">選択した要素の設定</div>
+<div id="fields" class="controls"></div>
+<div class="actions" style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap">
+<button class="action primary" id="applySettings">設定を適用</button>
+<button class="action" id="format">タグごとに改行</button>
+</div>
+</div>
+</div>
+</section>
+<section class="panel">
+<div class="panel-head">HTMLエディタ</div>
+<div class="editor-top">
+<button class="action primary" id="copy">HTML COPY</button>
+<button class="action" id="selectAll">全選択</button>
+<button class="action" id="clear">クリア</button>
+<button class="action" id="starter">サンプルを挿入</button>
+<button class="action" data-wrap="b">選択範囲を b</button>
+<button class="action" data-wrap="i">選択範囲を i</button>
+<button class="action" data-wrap="strong">選択範囲を strong</button>
+<button class="action" data-wrap="span">選択範囲を span</button>
+<button class="action" id="wrapDiv">選択範囲をDIVで囲む</button>
+<button class="action" id="editDiv">選択したDIVを編集</button>
+<button class="action" id="editP">選択したPを編集</button>
+<button class="action" id="editSpan">選択したSPANを編集</button>
+</div>
+<div class="editor-label"><span>HTML（ここに直接入力・編集できます）</span><span id="cursorInfo">カーソル位置：—</span></div>
+<textarea id="code" spellcheck="false" aria-label="HTMLコードエディタ"><div style="padding:16px;">
+<h2 style="color:#9fc762;font-size:20px;">Character Profile</h2>
+<p>ここに紹介文を入力します。</p>
+<div style="height:0;border:0;border-top:1px solid #9fc762;width:100%;margin:18px auto;"></div>
+</div></textarea>
+<div style="display:flex;justify-content:flex-end;padding:8px 12px;background:#1d1d20;border-top:1px solid var(--line);"><button class="action primary" id="copyBottom">HTML COPY</button></div>
+<div class="preview-head"><span>プレビュー</span><button class="action" id="refresh">プレビューを更新</button></div>
+<div id="preview"></div>
+<div class="panel-body">
+<div class="status" id="status" aria-live="polite"></div>
+<p class="hint">※ プレビュー内のクリックでカーソル位置を指定することはできません。プレビューは表示確認用です。HTMLはタグごとに改行し、インデントは付けません。Talelynx上での表示は実際に貼り付けて確認してください。</p>
+</div>
+</section>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const code=$('#code');
+let selectedType='div';
+let selectedOpen=0, selectedClose=0;
+const defaults={
+ div:{bg:'',color:'',borderColor:'#9fc762',borderWidth:0,radius:0,padding:0,margin:0,maxWidth:0,autoMargin:false,align:'left'},
+ divbox:{bg:'#202024',color:'#9fc762',borderColor:'#9fc762',borderWidth:1,radius:10,padding:14,margin:0,maxWidth:0,autoMargin:false,align:'left'},
+ h1:{color:'#9fc762',size:28,align:'left',weight:'bold',margin:'.67em 0',padding:0},
+ h2:{color:'#9fc762',size:22,align:'left',weight:'bold',margin:'.83em 0',padding:0},
+ h3:{color:'#9fc762',size:18,align:'left',weight:'bold',margin:'1em 0',padding:0},
+ h4:{color:'#9fc762',size:16,align:'left',weight:'bold',margin:'1.33em 0',padding:0},
+ p:{color:'',size:14,align:'left',lineHeight:1.7,margin:'1em 0',padding:0},
+ span:{color:'#9fc762',size:14,weight:'normal',align:'inherit'},
+ blockquote:{color:'#9fc762',borderColor:'#9fc762',size:14},
+ details:{title:'開閉パネル',body:'ここに本文を入力します。',color:'#9fc762',bg:'#202024',size:16,padding:14,marker:true},
+ lineh:{color:'#9fc762',length:100,thickness:1,margin:18},
+ linev:{color:'#9fc762',length:60,thickness:1,margin:12},
+ ul:{},ol:{},li:{text:'リスト項目'}
+};
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function tagPair(tag,inner,style=''){return `<${tag}${style?` style="${style}"`:''}>\n${inner}\n</${tag}>`;}
+function makeSnippet(type,v){
+ const sty=(a)=>a.filter(Boolean).join(';');
+ const boxStyle=sty([
+   v.bg?`background-color:${v.bg}`:'',
+   v.color?`color:${v.color}`:'',
+   `border:${Number(v.borderWidth)||0}px solid ${v.borderColor||'#000000'}`,
+   `border-radius:${Number(v.radius)||0}px`,
+   `padding:${Number(v.padding)||0}px`,
+   `margin:${v.autoMargin?' '+(Number(v.margin)||0)+'px auto':(Number(v.margin)||0)+'px'}`,
+   Number(v.maxWidth)>0?`max-width:${Number(v.maxWidth)}px`:'',
+   `text-align:${v.align||'left'}`
+ ]);
+ if(type==='div') return tagPair('div','ここに内容を入力します。',sty([normalizeColorInput(v.bg)?`background-color:${normalizeColorInput(v.bg)}`:'',normalizeColorInput(v.color)?`color:${normalizeColorInput(v.color)}`:'',`border:${Number(v.borderWidth)||0}px solid ${v.borderColor||'#000000'}`,`border-radius:${Number(v.radius)||0}px`,`padding:${Number(v.padding)||0}px`,`margin:${v.autoMargin?' '+(Number(v.margin)||0)+'px auto':(Number(v.margin)||0)+'px'}`,Number(v.maxWidth)>0?`max-width:${Number(v.maxWidth)}px`:'',`text-align:${v.align||'left'}`]));
+ if(type==='divbox') return tagPair('div','ここに内容を入力します。',sty([normalizeColorInput(v.bg)?`background-color:${normalizeColorInput(v.bg)}`:'',normalizeColorInput(v.color)?`color:${normalizeColorInput(v.color)}`:'',`border:${Number(v.borderWidth)||0}px solid ${v.borderColor}`,`border-radius:${Number(v.radius)||0}px`,`padding:${Number(v.padding)||0}px`,`margin:${v.autoMargin?' '+(Number(v.margin)||0)+'px auto':(Number(v.margin)||0)+'px'}`,Number(v.maxWidth)>0?`max-width:${Number(v.maxWidth)}px`:'',`text-align:${v.align||'left'}`]));
+ if(/^h[1-4]$/.test(type)) return tagPair(type,'見出しテキスト',sty([`color:${v.color}`,`font-size:${Number(v.size)||16}px`,`text-align:${v.align||'left'}`,`font-weight:${v.weight}`,`margin:${v.margin||'0'}`,`padding:${Number(v.padding)||0}px`]));
+ if(type==='p') return tagPair('p','ここに段落テキストを入力します。',sty([v.color?`color:${v.color}`:'',`font-size:${Number(v.size)||14}px`,`text-align:${v.align||'left'}`,`line-height:${Number(v.lineHeight)||1.7}`,`margin:${v.margin||'0'}`,`padding:${Number(v.padding)||0}px`]));
+ if(type==='span') return `<span style="${sty([`color:${v.color}`,`font-size:${Number(v.size)||14}px`,`font-weight:${v.weight}`,`text-align:${v.align||'inherit'}`])}">ここに文字</span>`;
+ if(type==='blockquote') return tagPair('blockquote','引用テキスト',sty([`color:${v.color}`,`border-left:3px solid ${v.borderColor}`,`padding:8px 14px`,`font-size:${Number(v.size)||14}px`,`margin:12px 0`,`text-align:${v.align||'left'}`]));
+ if(type==='details'){
+   const summaryStyle=sty([`list-style-type:${v.marker?'disclosure-closed':'none'}`,`color:${v.color}`,`background-color:${v.bg}`,`font-size:${Number(v.size)||16}px`,`padding:${Number(v.padding)||0}px`,`text-align:${v.align||'left'}`]);
+   return `<details style="border:none;">\n<summary style="${summaryStyle}">${esc(v.title||'開閉パネル')}</summary>\n<div style="padding:${Number(v.padding)||0}px;color:${v.color};text-align:${v.align||'left'};">${esc(v.body||'ここに本文を入力します。').replace(/\r?\n/g,'<br>')}</div>\n</details>`;
+ }
+ if(type==='lineh') return `<div style="height:0;border:0;border-top:${Math.max(1,Number(v.thickness)||1)}px solid ${v.color};width:${Math.min(100,Math.max(1,Number(v.length)||100))}%;margin:${Number(v.margin)||0}px auto;"></div>`;
+ if(type==='linev') return `<div style="display:block;width:0;height:${Math.max(1,Number(v.length)||60)}px;border-left:${Math.max(1,Number(v.thickness)||1)}px solid ${v.color};margin:${Number(v.margin)||0}px auto;"></div>`;
+ if(type==='ul'||type==='ol') return `<${type}>\n<li>リスト項目</li>\n<li>リスト項目</li>\n</${type}>`;
+ if(type==='li') return '<li>リスト項目</li>';
+ return '';
+}
+function inputField(label,key,type='text',value='',opts={}){
+ let input='';
+ if(type==='textarea') input=`<textarea data-key="${key}" rows="${opts.rows||4}" ${opts.placeholder?`placeholder="${esc(opts.placeholder)}"`:''}>${esc(value)}</textarea>`;
+ else if(type==='checkbox') input=`<input type="checkbox" data-key="${key}" ${value?'checked':''}>`;
+ else if(type==='select') input=`<select data-key="${key}">${opts.options.map(o=>`<option value="${o[0]}" ${value===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select>`;
+ else input=`<input type="${type}" data-key="${key}" value="${esc(value)}" ${opts.placeholder?`placeholder="${esc(opts.placeholder)}"`:''} ${opts.min!==undefined?`min="${opts.min}"`:''} ${opts.max!==undefined?`max="${opts.max}"`:''} ${opts.step!==undefined?`step="${opts.step}"`:''}>`;
+ return `<label>${label}${input}</label>`;
+}
+function fieldsFor(type,v){
+ const f=[];
+const color=(label,key,allowNone=false)=>f.push(inputField(label,key,'text',v[key]||'#9fc762',{placeholder:'#RRGGBB'}));
+ const num=(label,key,min=0,max=100)=>f.push(inputField(label,key,'number',v[key]??0,{min,max}));
+ const text=(label,key)=>f.push(inputField(label,key,'text',v[key]??''));
+ const align=()=>f.push(inputField('文字揃え','align','select',v.align||'left',{options:[['left','左揃え'],['center','中央揃え'],['right','右揃え']]}));
+ if(type==='div'||type==='divbox'){
+   f.push(inputField('背景色（#）','bg','text',v.bg||'#',{placeholder:'#RRGGBB'}));
+   f.push(inputField('文字色（#）','color','text',v.color||'#',{placeholder:'#RRGGBB'}));
+   color('ボーダー色','borderColor');num('ボーダー太さ（px）','borderWidth',0,12);
+   num('角丸（px）','radius',0,100);num('内側余白（px）','padding',0,100);
+   num('外側余白（px）','margin',0,200);num('max-width（px）','maxWidth',0,2000);
+   f.push(`<label class="wide">左右中央寄せ（margin: n px auto） <input type="checkbox" data-key="autoMargin" ${v.autoMargin?'checked':''}></label>`);
+   align();
+ }else if(/^h[1-4]$/.test(type)){
+   color('文字色','color');num('文字サイズ（px）','size',8,72);align();
+   f.push(inputField('太さ','weight','select',v.weight,{options:[['normal','通常'],['bold','太字']]}));
+   f.push(inputField('外側余白（CSS値）','margin','text',v.margin||'0'));
+   num('内側余白（px）','padding',0,100);
+ }else if(type==='p'){
+   f.push(inputField('文字色（空欄＝継承）','color','text',v.color||''));num('文字サイズ（px）','size',8,72);align();
+   num('行間（倍率）','lineHeight',1,3);
+   f.push(inputField('外側余白（CSS値）','margin','text',v.margin||'0'));
+   num('内側余白（px）','padding',0,100);
+ }else if(type==='span'){
+   color('文字色','color');num('文字サイズ（px）','size',8,72);
+   f.push(inputField('太さ','weight','select',v.weight,{options:[['normal','通常'],['bold','太字']]}));
+   align();
+ }else if(type==='blockquote'){
+   color('文字色','color');color('左ボーダー色','borderColor');num('文字サイズ（px）','size',8,72);align();
+ }else if(type==='details'){
+   text('summaryのタイトル','title');f.push(inputField('本文（改行可）','body','textarea',v.body||'',{rows:4,placeholder:'ここに本文を入力します。'}));color('文字色','color');color('背景色','bg');
+   num('文字サイズ（px）','size',8,72);num('内側余白（px）','padding',0,80);align();
+   f.push(`<label class="wide">▶マーカーを表示 <input type="checkbox" data-key="marker" ${v.marker?'checked':''}></label>`);
+ }else if(type==='lineh'||type==='linev'){
+   color('線の色','color');num('長さ（'+(type==='lineh'?'%':'px')+'）','length',1,type==='lineh'?100:1000);
+   num('太さ（px）','thickness',1,12);num('余白（px）','margin',0,100);
+ }else if(type==='li'){text('項目の文字','text');}
+ $('#fields').innerHTML=f.join('');
+}
+function normalizeColorInput(value){
+ const s=String(value??'').trim();
+ if(s==='' || s==='#') return '';
+ return s.startsWith('#') ? s : '#'+s;
+}
+function insertAtCursor(text){
+ const start=code.selectionStart,end=code.selectionEnd;
+ code.setRangeText(text,start,end,'end');
+ code.focus();
+ const pos=code.selectionStart;
+ $('#cursorInfo').textContent='カーソル位置：'+pos;
+ refreshPreview();
+}
+function refreshPreview(){
+ try{$('#preview').innerHTML=code.value;$('#status').textContent='プレビューを更新しました。';}
+ catch(e){$('#status').textContent='プレビューの更新中にエラーが発生しました。';}
+}
+function selectType(type){
+ selectedType=type;
+ const v={...(defaults[type]||{})};
+ fieldsFor(type,v);
+ $('#fields').querySelectorAll('[data-key]').forEach(el=>{
+   el.addEventListener('input',()=>{});
+ });
+ $('#applySettings').onclick=()=>{
+   const values={...v};
+   $('#fields').querySelectorAll('[data-key]').forEach(el=>{
+     values[el.dataset.key]=el.type==='checkbox'?el.checked:(el.type==='number'?Number(el.value):el.value);
+   });
+   const snippet=makeSnippet(type,values);
+   insertAtCursor(snippet);
+   $('#status').textContent='要素を挿入しました。必要ならHTML欄で中身を編集できます。';
+ };
+}
+document.querySelectorAll('[data-insert]').forEach(b=>b.addEventListener('click',()=>{
+ const type=b.dataset.insert;
+ selectType(type);
+ if(type==='ul'||type==='ol'||type==='li'||type==='span'||type==='p'||type==='div'||type==='divbox'||type==='details'||type==='blockquote'||/^h[1-4]$/.test(type)||type==='lineh'||type==='linev'){
+   $('#status').textContent='設定を確認して「設定を適用」を押すと、カーソル位置に挿入します。';
+ }
+}));
+function wrapSelection(tag, style=''){
+ const start=code.selectionStart,end=code.selectionEnd;
+ if(start===end){$('#status').textContent='先にHTML欄で囲みたい文字またはタグを選択してね。';code.focus();return;}
+ const selected=code.value.slice(start,end);
+ const open=`<${tag}${style?` style="${style}"`:''}>`, close=`</${tag}>`;
+ code.setRangeText(open+selected+close,start,end,'end');
+ code.focus();refreshPreview();$('#status').textContent=`選択範囲を${tag}で囲みました。`;
+}
+document.querySelectorAll('[data-wrap]').forEach(b=>b.addEventListener('click',()=>wrapSelection(b.dataset.wrap)));
+$('#wrapDiv').addEventListener('click',()=>{
+ const start=code.selectionStart,end=code.selectionEnd;
+ if(start===end){$('#status').textContent='先に囲みたい範囲を選択してね。';return;}
+ const selected=code.value.slice(start,end);
+ selectType('div');
+ // Use default div style settings; selected text or markup is preserved as inner content.
+ $('#fields').querySelectorAll('[data-key]').forEach(el=>{
+   if(el.dataset.key==='bg'||el.dataset.key==='color')el.value='#';
+   if(el.dataset.key==='radius')el.value='0';
+ });
+ const vals={...defaults.div};
+ $('#applySettings').onclick=()=>{
+   const values={...vals};
+   $('#fields').querySelectorAll('[data-key]').forEach(el=>values[el.dataset.key]=el.type==='checkbox'?el.checked:(el.type==='number'?Number(el.value):el.value));
+   const snippet=makeSnippet('div',values).replace('ここに内容を入力します。',selected);
+   code.setRangeText(snippet,start,end,'end');code.focus();refreshPreview();
+   $('#status').textContent='選択範囲をDIVで囲みました。設定を変更して再度適用すれば新しいDIVを挿入できます。';
+ };
+ $('#status').textContent='左側でDIVの背景・余白・max-widthなどを設定して「設定を適用」を押してね。';
+});
+$('#editSpan').addEventListener('click',()=>{
+ const pos=code.selectionStart,src=code.value;
+ const opens=[...src.matchAll(/<span\b[^>]*>/gi)];let chosen=null;
+ for(const m of opens){const openAt=m.index,openEnd=openAt+m[0].length;let depth=1,re=/<\/?span\b[^>]*>/gi;re.lastIndex=openEnd;let mm;
+   while((mm=re.exec(src))){if(/^<\s*span\b/i.test(mm[0]))depth++;else depth--;if(depth===0){if(openAt<=pos&&pos<=mm.index+mm[0].length)chosen={openAt,openEnd,tag:m[0]};break;}}
+ }
+ if(!chosen){$('#status').textContent='カーソルを編集したいSPANの中に置いてから押してね。';return;}
+ const raw=chosen.tag.match(/style=["']([^"']*)["']/i)?.[1]||'';
+ const get=(prop,def='')=>raw.match(new RegExp('(?:^|;)\\s*'+prop+'\\s*:\\s*([^;]+)','i'))?.[1]?.trim()||def;
+ const vals={...defaults.span,color:get('color','#9fc762'),size:parseFloat(get('font-size','14'))||14,weight:get('font-weight','normal'),align:get('text-align','inherit')};
+ fieldsFor('span',vals);
+ $('#fields').querySelectorAll('[data-key]').forEach(el=>{const k=el.dataset.key;if(k in vals)el.value=vals[k]??'';});
+ $('#applySettings').onclick=()=>{
+   const values={...vals};$('#fields').querySelectorAll('[data-key]').forEach(el=>values[el.dataset.key]=el.type==='checkbox'?el.checked:(el.type==='number'?Number(el.value):el.value));
+   const style=makeSnippet('span',values).match(/style="([^"]*)"/)?.[1]||'';
+   const replacement=chosen.tag.replace(/style=["'][^"']*["']/i,'').replace(/>$/,'')+` style="${style}">`;
+   code.setRangeText(replacement,chosen.openAt,chosen.openEnd,'end');code.focus();refreshPreview();$('#status').textContent='SPANのスタイルを更新しました。';
+ };
+ $('#status').textContent='SPANの文字色・サイズなどを変更して「設定を適用」を押してね。';
+});
+$('#editDiv').addEventListener('click',()=>{
+ const pos=code.selectionStart,src=code.value;
+ const tokenRe=/<\/?div\b[^>]*>/gi;
+ const stack=[],pairs=[];
+ let m;
+ while((m=tokenRe.exec(src))){
+   if(/^<\s*div\b/i.test(m[0])){
+     stack.push({openAt:m.index,openEnd:m.index+m[0].length,tag:m[0]});
+   }else{
+     const opened=stack.pop();
+     if(opened){
+       pairs.push({...opened,closeStart:m.index,closeEnd:m.index+m[0].length});
+     }
+   }
+ }
+ const candidates=pairs.filter(p=>p.openAt<=pos && pos<=p.closeEnd);
+ candidates.sort((a,b)=>(a.closeEnd-a.openAt)-(b.closeEnd-b.openAt));
+ const chosen=candidates[0]||null;
+ if(!chosen){$('#status').textContent='カーソルを編集したいDIVの開始タグ・本文・終了タグのどこかに置いてね。';return;}
+ const raw=chosen.tag.match(/style=["']([^"']*)["']/i)?.[1]||'';
+ const get=(prop,def='')=>raw.match(new RegExp('(?:^|;)\\s*'+prop+'\\s*:\\s*([^;]+)','i'))?.[1]?.trim()||def;
+ const marginMatch=raw.match(/margin\s*:\s*([^;]+)/i);
+ const marginRaw=marginMatch?.[1]?.trim()||'0px';
+ const marginNum=parseFloat(marginRaw)||0;
+ const vals={...defaults.div,
+   bg:get('background-color',''),
+   color:get('color',''),
+   borderColor:get('border-color','#9fc762'),
+   borderWidth:parseFloat(get('border-width','0'))||0,
+   radius:parseFloat(get('border-radius','0'))||0,
+   padding:parseFloat(get('padding','0'))||0,
+   margin:marginNum,
+   maxWidth:parseFloat(get('max-width','0'))||0,
+   autoMargin:/\bauto\b/i.test(marginRaw),
+   align:get('text-align','left')
+ };
+ fieldsFor('div',vals);
+ $('#fields').querySelectorAll('[data-key]').forEach(el=>{
+   const k=el.dataset.key;
+   if(k in vals){
+     if(el.type==='checkbox')el.checked=!!vals[k];
+     else if(el.type==='text' && (k==='bg'||k==='color'))el.value=vals[k]||'#';
+     else el.value=vals[k]??'';
+   }
+ });
+ $('#applySettings').onclick=()=>{
+   const values={...vals};
+   $('#fields').querySelectorAll('[data-key]').forEach(el=>{
+     values[el.dataset.key]=el.type==='checkbox'?el.checked:(el.type==='number'?Number(el.value):el.value);
+   });
+   const style=makeSnippet('div',values).match(/<div style="([^"]*)">/)?.[1]||'';
+   const newOpenTag=chosen.tag.replace(/\sstyle=["'][^"']*["']/i,'') .replace(/>$/,'')+` style="${style}">`;
+   code.setRangeText(newOpenTag,chosen.openAt,chosen.openEnd,'end');
+   code.focus();refreshPreview();
+   $('#status').textContent='選択したDIVのスタイルを更新しました。既存DIVを入れ子にせず、開始タグだけを書き換えました。';
+ };
+ $('#status').textContent='選択したDIVの設定を変更して「設定を適用」を押してね。';
+});
+
+$('#editP').addEventListener('click',()=>{
+  const pos=code.selectionStart,src=code.value;
+  const tokenRe=/<\/?p\b[^>]*>/gi;
+  const stack=[],pairs=[];
+  let m;
+  while((m=tokenRe.exec(src))){
+    if(/^<\s*p\b/i.test(m[0])){
+      stack.push({openAt:m.index,openEnd:m.index+m[0].length,tag:m[0]});
+    }else{
+      const opened=stack.pop();
+      if(opened)pairs.push({...opened,closeStart:m.index,closeEnd:m.index+m[0].length});
+    }
+  }
+  const candidates=pairs.filter(p=>p.openAt<=pos&&pos<=p.closeEnd);
+  candidates.sort((a,b)=>(a.closeEnd-a.openAt)-(b.closeEnd-b.openAt));
+  const chosen=candidates[0]||null;
+  if(!chosen){$('#status').textContent='カーソルを編集したいpの開始タグ・本文・終了タグのどこかに置いてね。';return;}
+  const raw=chosen.tag.match(/style=["']([^"']*)["']/i)?.[1]||'';
+  const get=(prop,def='')=>raw.match(new RegExp('(?:^|;)\\s*'+prop+'\\s*:\\s*([^;]+)','i'))?.[1]?.trim()||def;
+  const margin=raw.match(/margin\s*:\s*([^;]+)/i)?.[1]?.trim()||'1em 0';
+  const vals={...defaults.p,color:get('color',''),size:parseFloat(get('font-size','14'))||14,align:get('text-align','left'),lineHeight:parseFloat(get('line-height','1.7'))||1.7,margin,padding:parseFloat(get('padding','0'))||0};
+  fieldsFor('p',vals);
+  $('#fields').querySelectorAll('[data-key]').forEach(el=>{
+    const k=el.dataset.key;
+    if(k in vals)el.value=vals[k]??'';
+  });
+  $('#applySettings').onclick=()=>{
+    const values={...vals};
+    $('#fields').querySelectorAll('[data-key]').forEach(el=>values[el.dataset.key]=el.type==='checkbox'?el.checked:(el.type==='number'?Number(el.value):el.value));
+    const style=makeSnippet('p',values).match(/<p style="([^"]*)">/)?.[1]||'';
+    const newOpenTag=chosen.tag.replace(/\sstyle=["'][^"']*["']/i,'').replace(/>$/,'')+` style="${style}">`;
+    code.setRangeText(newOpenTag,chosen.openAt,chosen.openEnd,'end');
+    code.focus();refreshPreview();
+    $('#status').textContent='選択したPのスタイルを更新しました。';
+  };
+  $('#status').textContent='選択したPの文字色・サイズ・行間・余白などを変更して「設定を適用」を押してね。';
+});
+
+code.addEventListener('keyup',()=>$('#cursorInfo').textContent='カーソル位置：'+code.selectionStart);
+code.addEventListener('click',()=>$('#cursorInfo').textContent='カーソル位置：'+code.selectionStart);
+$('#refresh').addEventListener('click',refreshPreview);
+$('#format').addEventListener('click',()=>{const a=code.selectionStart,b=code.selectionEnd;code.value=formatHTML(code.value);code.setSelectionRange(Math.min(a,code.value.length),Math.min(b,code.value.length));code.focus();refreshPreview();$('#status').textContent='タグごとに改行しました（インデントなし）。';});
+$('#copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(code.value);$('#status').textContent='HTMLをコピーしました。';}catch(e){code.focus();code.select();$('#status').textContent='自動コピーできないため、選択されたコードをコピーしてください。';}});
+$('#copyBottom').addEventListener('click',()=>$('#copy').click());
+$('#selectAll').addEventListener('click',()=>{code.focus();code.select();});
+$('#clear').addEventListener('click',()=>{if(confirm('HTMLをすべて削除しますか？')){code.value='';refreshPreview();}});
+$('#starter').addEventListener('click',()=>{if(code.value.trim()&&!confirm('現在のHTMLをサンプルに置き換えますか？'))return;code.value='<div style="padding:16px;">\n<h2 style="color:#9fc762;font-size:20px;">Character Profile</h2>\n<p>ここに紹介文を入力します。</p>\n<div style="height:0;border:0;border-top:1px solid #9fc762;width:100%;margin:18px auto;"></div>\n</div>';refreshPreview();});
+selectType('div');
+refreshPreview();
+</script>
+</body>
+</html>
