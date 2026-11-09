@@ -370,7 +370,7 @@
     list.lastElementChild.scrollIntoView({behavior:"smooth", block:"center"});
     list.lastElementChild.querySelector('[data-role="category"]').focus({preventScroll:true});
   });
-  select.addEventListener("change", () => { saveBeforeSwitch(); loadSheet(select.value); showToast("シートを切り替えました"); });
+  select.addEventListener("change", () => { const targetId = select.value; saveBeforeSwitch(); loadSheet(targetId); showToast("シートを切り替えました"); });
   document.getElementById("new-sheet").addEventListener("click", () => { saveBeforeSwitch(); createSheet(); showToast("新しいシートを作成しました"); });
   document.getElementById("duplicate-sheet").addEventListener("click", () => {
     saveBeforeSwitch();
