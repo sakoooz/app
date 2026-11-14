@@ -166,18 +166,23 @@
   const blankData = () => ({ title: "", note: "", groups: [blankGroup(), blankGroup()] });
   const currentSheet = () => store.sheets.find(s => s.id === activeId) || null;
 
-  function setToolbarOpen(open) {
-    toolbarPanel.classList.toggle("is-open", open);
-    toolbarPanel.setAttribute("aria-hidden", String(!open));
-    toolbarToggle.setAttribute("aria-expanded", String(open));
-    toolbarToggle.setAttribute("aria-label", open ? "シート操作を閉じる" : "シート操作を開く");
-    toolbarToggle.innerHTML = '<span class="toolbar-toggle-icon" aria-hidden="true">' + (open ? "×" : "↗") + '</span>';
-  }
-  toolbarToggle.addEventListener("click", () => setToolbarOpen(!toolbarPanel.classList.contains("is-open")));
-  document.addEventListener("keydown", e => { if (e.key === "Escape") setToolbarOpen(false); });
-  document.addEventListener("click", e => {
-    if (toolbarPanel.classList.contains("is-open") && !toolbarPanel.contains(e.target) && !toolbarToggle.contains(e.target)) setToolbarOpen(false);
-  });
+const toolbarToggleIcon = toolbarToggle.querySelector(".toolbar-toggle-icon");
+
+function setToolbarOpen(open) {
+  toolbarPanel.classList.toggle("is-open", open);
+  toolbarPanel.setAttribute("aria-hidden", String(!open));
+  toolbarToggle.setAttribute("aria-expanded", String(open));
+  toolbarToggle.setAttribute("aria-label", open ? "シート操作を閉じる" : "シート操作を開く");
+  toolbarToggleIcon.textContent = open ? "×" : "↗";
+}
+toolbarToggle.addEventListener("click", () => setToolbarOpen(!toolbarPanel.classList.contains("is-open")));
+document.addEventListener("keydown", e => { if (e.key === "Escape") setToolbarOpen(false); });
+document.addEventListener("click", e => {
+  if (!toolbarPanel.classList.contains("is-open")) return;
+  const path = e.composedPath();
+  if (path.includes(toolbarPanel) || path.includes(toolbarToggle)) return;
+  setToolbarOpen(false);
+});
 
   function showToast(message) {
     toast.textContent = message;
