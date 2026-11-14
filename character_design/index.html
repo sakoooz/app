@@ -196,6 +196,7 @@
   const STORAGE_KEY = "renaiCharacterDesignSheet.multi.v2";
 
   const toolbarToggle = document.getElementById("toolbar-toggle");
+  const toolbarToggleIcon = toolbarToggle.querySelector(".toolbar-toggle-icon");
   const toolbarPanel = document.getElementById("sheet-toolbar");
 
   function setToolbarOpen(open) {
@@ -203,7 +204,7 @@
     toolbarPanel.setAttribute("aria-hidden", String(!open));
     toolbarToggle.setAttribute("aria-expanded", String(open));
     toolbarToggle.setAttribute("aria-label", open ? "キャラクター操作を閉じる" : "キャラクター操作を開く");
-    toolbarToggle.innerHTML = '<span class="toolbar-toggle-icon" aria-hidden="true">' + (open ? "×" : "↗") + '</span>';
+    toolbarToggleIcon.textContent = open ? "×" : "↗";
   }
 
   toolbarToggle.addEventListener("click", () => {
@@ -216,7 +217,8 @@
 
   document.addEventListener("click", (event) => {
     if (!toolbarPanel.classList.contains("is-open")) return;
-    if (toolbarPanel.contains(event.target) || toolbarToggle.contains(event.target)) return;
+    const path = event.composedPath();
+    if (path.includes(toolbarPanel) || path.includes(toolbarToggle)) return;
     setToolbarOpen(false);
   });
 
