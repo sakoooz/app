@@ -328,7 +328,10 @@ input:focus, textarea:focus {
   box-shadow: 0 7px 24px rgba(43, 52, 36, .24);
   transition: transform .16s ease, background .16s ease;
 }
-.toolbar-toggle:hover { transform: translateY(-2px); background: var(--color-primary-dark); }
+.toolbar-toggle { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+@media (hover: hover) {
+  .toolbar-toggle:hover { transform: translateY(-2px); background: var(--color-primary-dark); }
+}
 .toolbar-toggle:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
 .toolbar-toggle-icon {
   display: block;
