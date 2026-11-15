@@ -140,14 +140,50 @@ const DESIGN = {
 };
 
 const themes = {  
-  seashore: {
-    bg: "#e1dedb",
+  midnightink: {
+    bg: "#0f1420",
     right: "#a8a8a8",
-    text: "#763f03",
-    muted: "#815221",
-    tag: "#b2b7ba",
-    tagText: "#763f03",
-    accent: "#038a8b"
+    text: "#e8ecf4",
+    muted: "#aab3c5",
+    tag: "#2b3a5c",
+    tagText: "#e8ecf4",
+    accent: "#d9b36c"
+  },
+  noirrose: {
+    bg: "#121012",
+    right: "#a8a8a8",
+    text: "#f1e6e6",
+    muted: "#c4b0b3",
+    tag: "#7a1f35",
+    tagText: "#ffffff",
+    accent: "#e0a4a8"
+  },
+  mossnight: {
+    bg: "#0e1512",
+    right: "#a8a8a8",
+    text: "#e6efe8",
+    muted: "#a9bdb0",
+    tag: "#24463a",
+    tagText: "#e6efe8",
+    accent: "#c9a86a"
+  },
+  burgundygold: {
+    bg: "#1c0f14",
+    right: "#a8a8a8",
+    text: "#f3e3d3",
+    muted: "#cdb8a6",
+    tag: "#8c2a3e",
+    tagText: "#ffffff",
+    accent: "#d6a85a"
+  },
+  ivorysumi: {
+    bg: "#f2ede4",
+    right: "#a8a8a8",
+    text: "#1c1a17",
+    muted: "#55504a",
+    tag: "#1c1a17",
+    tagText: "#f2ede4",
+    accent: "#9c2f2f"
   },
   nightcities: {
     bg: "#10120e",
@@ -158,69 +194,6 @@ const themes = {
     tagText: "#ffffff",
     accent: "#df992a"
   },
-  flowers: {
-    bg: "#fdfdef",
-    right: "#a8a8a8",
-    text: "#0e1512",
-    muted: "#30423a",
-    tag: "#e9a052",
-    tagText: "#0e1512",
-    accent: "#ffa5a3"
-  },
-  teacups: {
-    bg: "#dfdde0",
-    right: "#a8a8a8",
-    text: "#72420d",
-    muted: "#765737",
-    tag: "#978d8c",
-    tagText: "#ffffff",
-    accent: "#ce8d03"
-  },
-  cleancities: {
-    bg: "#d6dee2",
-    right: "#a8a8a8",
-    text: "#141a1a",
-    muted: "#354040",
-    tag: "#c1a08d",
-    tagText: "#ffffff",
-    accent: "#0486b8"
-  },
-  basketgoal: {
-    bg: "#e9e3df",
-    right: "#a8a8a8",
-    text: "#1b1c18",
-    muted: "#41413a",
-    tag: "#f5f5f5",
-    tagText: "#1b1c18",
-    accent: "#f48863"
-  },
-  ayame: {
-    bg: "#353866",
-    right: "#a8a8a8",
-    text: "#F8FAFF",
-    muted: "#c4c8d4",
-    tag: "#AAABD3",
-    tagText: "#353866",
-    accent: "#CBA6C3"
-  },
-  pistachio: {
-    bg: "#e2e7e9",
-    right: "#a8a8a8",
-    text: "#142718",
-    muted: "#273f2c",
-    tag: "#b5b067",
-    tagText: "#142718",
-    accent: "#8b634d"
-  },
-  greenapple: {
-    bg: "#c6d3c8",
-    right: "#a8a8a8",
-    text: "#0c1601",
-    muted: "#172904",
-    tag: "#9f8322",
-    tagText: "#c6d3c8",
-    accent: "#639d01"
-  },
   cyberpunk: {
     bg: "#1a1a1a",
     right: "#a8a8a8",
@@ -229,24 +202,6 @@ const themes = {
     tag: "#127c8c",
     tagText: "#8addcb",
     accent: "#f35e5c"
-  },
-  purplesmoke: {
-    bg: "#566270",
-    right: "#a8a8a8",
-    text: "#FFFFF3",
-    muted: "#d1d1c7",
-    tag: "#837b93",
-    tagText: "#ffffff",
-    accent: "#A593E0"
-  },
-  berrychocolate: {
-    bg: "#5D3140",
-    right: "#a8a8a8",
-    text: "#F6D8BD",
-    muted: "#d4b59a",
-    tag: "#F39399",
-    tagText: "#000000",
-    accent: "#CF4173"
   },
 };
 
