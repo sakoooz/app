@@ -16,6 +16,7 @@ const fields = {
 
 const imageInput = document.getElementById("imageInput");
 const qrInput = document.getElementById("qrInput");
+const removeQr = document.getElementById("removeQr");
 const imageZoom = document.getElementById("imageZoom");
 const imageX = document.getElementById("imageX");
 const imageY = document.getElementById("imageY");
@@ -52,78 +53,90 @@ const DESIGN = {
   canvasHeight: 675,
   leftWidth: 675,
 
-  // 左側の文字の基準位置
-  textX: 75,
+  // 左側の余白（左端の揃え位置 / 右端の余白）
+  marginLeft: 64,
+  marginRight: 56,
 
-  // サービス名
-  serviceX: 50,
-  serviceY: 55,
-  serviceFontSize: 30,
+  // ヘッダー（サービス名・URL・区切り線）
+  serviceY: 46,
+  serviceFontSize: 26,
+  serviceLetterSpacing: 2,
+  urlY: 54,
+  urlFontSize: 15,
+  urlLetterSpacing: 0.5,
+  headerLineY: 94,
+  headerLineAlpha: 0.35,
 
-  // URL
-  urlX: 235,
-  urlY: 60,
-  urlFontSize: 20,
+  // 作品タイトル
+  titleY: 118,
+  titleFontSize: 54,
+  titleMinFontSize: 34,
+  titleMaxWidth: 555,
+  titleFontWeight: 700,
+  titleLetterSpacing: 3,
+
+  // 作品ジャンル（先頭に短いアクセント線）
+  genreY: 188,
+  genreFontSize: 16,
+  genreFontWeight: 600,
+  genreLetterSpacing: 2,
+  genreBarWidth: 22,
+  genreBarGap: 12,
+
+  // 作品紹介文
+  descriptionY: 232,
+  descriptionWidth: 545,
+  descriptionFontSize: 19,
+  descriptionLineHeight: 32,
+  descriptionMaxLines: 3,
+  descriptionLetterSpacing: 0.6,
+
+  // CHARACTER 見出し（右に細い線が伸びる）
+  characterLabelY: 346,
+  characterLabelFontSize: 14,
+  characterLabelLetterSpacing: 5,
+  characterLabelLineGap: 18,
+  characterLabelLineAlpha: 0.45,
+
+  // キャラクター名
+  characterNameY: 374,
+  characterNameFontSize: 22,
+  characterNameFontWeight: 700,
+  characterNameLetterSpacing: 2,
+
+  // キャラ紹介文
+  characterDescriptionY: 414,
+  characterDescriptionWidth: 545,
+  characterDescriptionFontSize: 17,
+  characterDescriptionLineHeight: 28,
+  characterDescriptionMaxLines: 4,
+  characterDescriptionLetterSpacing: 0.4,
+
+  // タグ
+  tagY: 540,
+  tagHeight: 34,
+  tagRadius: 17,
+  tagFontSize: 15,
+  tagPaddingX: 17,
+  tagGap: 10,
+  tagLetterSpacing: 1,
+  tagTextColor: null,
+
+  // キャッチコピー
+  catchcopyY: 596,
+  catchcopyFontSize: 27,
+  catchcopyMinFontSize: 18,
+  catchcopyMaxWidth: 555,
+  catchcopyLetterSpacing: 1,
 
   // QRコード
   qrX: 1075,
   qrY: 550,
   qrSize: 100,
 
-  // 作品タイトル
-  titleY: 112,
-  titleFontSize: 50,
-  titleMinFontSize: 34,
-  titleMaxWidth: 540,
-  titleFontWeight: 700,
-
-  // 作品ジャンル
-  genreY: 170,
-  genreFontSize: 16,
-  genreFontWeight: 600,
-
-  // 作品紹介文
-  descriptionY: 230,
-  descriptionWidth: 500,
-  descriptionFontSize: 20,
-  descriptionLineHeight: 28,
-  descriptionMaxLines: 3,
-
-  // CHARACTER
-  characterLabelY: 350,
-  characterLabelFontSize: 22,
-
-  // キャラクター名
-  characterNameX: 15,
-  characterNameY: 385,
-  characterNameFontSize: 21,
-
-  // キャラ紹介文
-  characterDescriptionX: 15,
-  characterDescriptionY: 420,
-  characterDescriptionWidth: 485,
-  characterDescriptionFontSize: 20,
-  characterDescriptionLineHeight: 28,
-  characterDescriptionMaxLines: 4,
-
-  // タグ
-  tagY: 520,
-  tagHeight: 40,
-  tagRadius: 25,
-  tagFontSize: 18,
-  tagPaddingX: 20,
-  tagGap: 10,
-  tagTextColor: null,
-
-  // キャッチコピー
-  catchcopyY: 585,
-  catchcopyFontSize: 28,
-  catchcopyMinFontSize: 20,
-  catchcopyMaxWidth: 540,
-
   // フォント
-  fontFamily: "'Shippori Mincho B1', serif",
-  characterLabelFontFamily: "'Shippori Mincho B1', serif"
+  fontFamily: "'Shippori Mincho B1', 'Noto Serif JP', serif",
+  characterLabelFontFamily: "'Shippori Mincho B1', 'Noto Serif JP', serif"
 };
 
 const themes = {  
@@ -238,8 +251,17 @@ const themes = {
 };
 
 
-function wrapText(text, maxWidth, font) {
+// 字間（letter-spacing）。非対応ブラウザでは何もしない
+function setSpacing(px) {
+  if ("letterSpacing" in ctx) ctx.letterSpacing = `${px}px`;
+}
+
+// 行頭に来てはいけない文字（禁則処理）。はみ出す場合は前の行にぶら下げる
+const NO_LINE_START = "、。，．,.)）]］}｝〕〉》」』】〙〗？！?!・：；:;ーぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮ…‥”’";
+
+function wrapText(text, maxWidth, font, spacing = 0) {
   ctx.font = font;
+  setSpacing(spacing);
   const lines = [];
   const paragraphs = String(text || "").split("\n");
 
@@ -252,7 +274,7 @@ function wrapText(text, maxWidth, font) {
     let line = "";
     for (const char of paragraph) {
       const test = line + char;
-      if (ctx.measureText(test).width > maxWidth && line) {
+      if (ctx.measureText(test).width > maxWidth && line && !NO_LINE_START.includes(char)) {
         lines.push(line);
         line = char;
       } else {
@@ -265,9 +287,10 @@ function wrapText(text, maxWidth, font) {
   return lines;
 }
 
-function drawTextBlock(text, x, y, maxWidth, font, lineHeight, color, maxLines = 99) {
-  const lines = wrapText(text, maxWidth, font).slice(0, maxLines);
+function drawTextBlock(text, x, y, maxWidth, font, lineHeight, color, maxLines = 99, spacing = 0) {
+  const lines = wrapText(text, maxWidth, font, spacing).slice(0, maxLines);
   ctx.font = font;
+  setSpacing(spacing);
   ctx.fillStyle = color;
   ctx.textBaseline = "top";
 
@@ -275,7 +298,17 @@ function drawTextBlock(text, x, y, maxWidth, font, lineHeight, color, maxLines =
     ctx.fillText(line, x, y + i * lineHeight);
   });
 
+  setSpacing(0);
   return y + lines.length * lineHeight;
+}
+
+// 横線（細い区切り線）
+function drawHLine(x1, x2, y, color, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.fillRect(x1, Math.round(y), x2 - x1, 1.5);
+  ctx.restore();
 }
 
 function getImageGeometry(img, x, y, w, h) {
@@ -306,9 +339,10 @@ function drawCoverImage(img, x, y, w, h) {
 }
 
 function render() {
-  const t = themes[fields.theme.value] || themes.dark;
+  const t = themes[fields.theme.value] || themes.seashore;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  setSpacing(0);
 
   const leftW = DESIGN.leftWidth;
   const imageX0 = leftW;
@@ -334,44 +368,55 @@ function render() {
     ctx.textBaseline = "top";
   }
 
-  const x = DESIGN.textX;
-
-  ctx.fillStyle = t.accent;
-  ctx.font = `${DESIGN.titleFontWeight} ${DESIGN.serviceFontSize}px ${DESIGN.fontFamily}`;
+  const x = DESIGN.marginLeft;
+  const right = leftW - DESIGN.marginRight;
   ctx.textBaseline = "top";
-  ctx.fillText(fields.serviceName.value || "サービス名", DESIGN.serviceX, DESIGN.serviceY);
+  ctx.textAlign = "left";
 
-  // URL
+  // ---- ヘッダー：サービス名（左）／URL（右揃え）／区切り線 ----
+  ctx.fillStyle = t.accent;
+  ctx.font = `700 ${DESIGN.serviceFontSize}px ${DESIGN.fontFamily}`;
+  setSpacing(DESIGN.serviceLetterSpacing);
+  ctx.fillText(fields.serviceName.value || "サービス名", x, DESIGN.serviceY);
+
   ctx.fillStyle = t.muted;
   ctx.font = `${DESIGN.urlFontSize}px ${DESIGN.fontFamily}`;
-  ctx.fillText(
-  fields.workUrl.value || "",
-  DESIGN.urlX,
-  DESIGN.urlY
-  );
+  setSpacing(DESIGN.urlLetterSpacing);
+  ctx.textAlign = "right";
+  ctx.fillText(fields.workUrl.value || "", right, DESIGN.urlY);
+  ctx.textAlign = "left";
+  setSpacing(0);
 
-  // タイトルは文字数だけでなく「実際の横幅」を測って自動縮小。
-  // DESIGN.titleFontSize から始め、titleMaxWidthに収まるまで小さくする。
+  drawHLine(x, right, DESIGN.headerLineY, t.muted, DESIGN.headerLineAlpha);
+
+  // ---- タイトル：実際の横幅を測って自動縮小 ----
   const title = fields.title.value || "作品タイトル";
   let titleSize = DESIGN.titleFontSize;
-  while (
-    titleSize > DESIGN.titleMinFontSize &&
-    (() => {
-      ctx.font = `${DESIGN.titleFontWeight} ${titleSize}px ${DESIGN.fontFamily}`;
-      return ctx.measureText(title).width > DESIGN.titleMaxWidth;
-    })()
-  ) {
+  setSpacing(DESIGN.titleLetterSpacing);
+  while (titleSize > DESIGN.titleMinFontSize) {
+    ctx.font = `${DESIGN.titleFontWeight} ${titleSize}px ${DESIGN.fontFamily}`;
+    if (ctx.measureText(title).width <= DESIGN.titleMaxWidth) break;
     titleSize -= 1;
   }
-
   ctx.fillStyle = t.text;
   ctx.font = `${DESIGN.titleFontWeight} ${titleSize}px ${DESIGN.fontFamily}`;
   ctx.fillText(title, x, DESIGN.titleY);
+  setSpacing(0);
 
-  ctx.fillStyle = t.accent;
-  ctx.font = `${DESIGN.genreFontWeight} ${DESIGN.genreFontSize}px ${DESIGN.fontFamily}`;
-  ctx.fillText(fields.genre.value || "", x, DESIGN.genreY);
+  // ---- ジャンル：短いアクセント線＋文字 ----
+  const genre = fields.genre.value || "";
+  if (genre) {
+    const barY = DESIGN.genreY + DESIGN.genreFontSize / 2 + 1;
+    ctx.fillStyle = t.accent;
+    ctx.fillRect(x, Math.round(barY), DESIGN.genreBarWidth, 2);
 
+    ctx.font = `${DESIGN.genreFontWeight} ${DESIGN.genreFontSize}px ${DESIGN.fontFamily}`;
+    setSpacing(DESIGN.genreLetterSpacing);
+    ctx.fillText(genre, x + DESIGN.genreBarWidth + DESIGN.genreBarGap, DESIGN.genreY);
+    setSpacing(0);
+  }
+
+  // ---- 作品紹介文 ----
   drawTextBlock(
     fields.description.value,
     x,
@@ -380,32 +425,46 @@ function render() {
     `${DESIGN.descriptionFontSize}px ${DESIGN.fontFamily}`,
     DESIGN.descriptionLineHeight,
     t.muted,
-    DESIGN.descriptionMaxLines
+    DESIGN.descriptionMaxLines,
+    DESIGN.descriptionLetterSpacing
   );
 
+  // ---- CHARACTER 見出し＋右へ伸びる線 ----
   ctx.fillStyle = t.accent;
   ctx.font = `700 ${DESIGN.characterLabelFontSize}px ${DESIGN.characterLabelFontFamily}`;
+  setSpacing(DESIGN.characterLabelLetterSpacing);
   ctx.fillText("CHARACTER", x, DESIGN.characterLabelY);
-
-  ctx.fillStyle = t.text;
-  ctx.font = `${DESIGN.characterNameFontSize}px ${DESIGN.fontFamily}`;
-  ctx.fillText(
-    fields.characterName.value || "キャラクター名",
-    x + DESIGN.characterNameX,
-    DESIGN.characterNameY
+  const labelW = ctx.measureText("CHARACTER").width;
+  setSpacing(0);
+  drawHLine(
+    x + labelW + DESIGN.characterLabelLineGap,
+    right,
+    DESIGN.characterLabelY + DESIGN.characterLabelFontSize / 2 + 1,
+    t.accent,
+    DESIGN.characterLabelLineAlpha
   );
 
+  // ---- キャラクター名 ----
+  ctx.fillStyle = t.text;
+  ctx.font = `${DESIGN.characterNameFontWeight} ${DESIGN.characterNameFontSize}px ${DESIGN.fontFamily}`;
+  setSpacing(DESIGN.characterNameLetterSpacing);
+  ctx.fillText(fields.characterName.value || "キャラクター名", x, DESIGN.characterNameY);
+  setSpacing(0);
+
+  // ---- キャラ紹介文 ----
   drawTextBlock(
     fields.characterDescription.value,
-    x + DESIGN.characterDescriptionX,
+    x,
     DESIGN.characterDescriptionY,
     DESIGN.characterDescriptionWidth,
     `${DESIGN.characterDescriptionFontSize}px ${DESIGN.fontFamily}`,
     DESIGN.characterDescriptionLineHeight,
     t.muted,
-    DESIGN.characterDescriptionMaxLines
+    DESIGN.characterDescriptionMaxLines,
+    DESIGN.characterDescriptionLetterSpacing
   );
 
+  // ---- タグ（文字は縦中央に配置） ----
   const tags = fields.tags.value
     .split(",")
     .map(s => s.trim())
@@ -413,57 +472,41 @@ function render() {
     .slice(0, 4);
 
   let tx = x;
-  const tagY = DESIGN.tagY;
-
   ctx.font = `${DESIGN.tagFontSize}px ${DESIGN.fontFamily}`;
+  setSpacing(DESIGN.tagLetterSpacing);
   tags.forEach(tag => {
     const tw = ctx.measureText(tag).width + DESIGN.tagPaddingX * 2;
     ctx.fillStyle = t.tag;
     ctx.beginPath();
-    ctx.roundRect(tx, tagY, tw, DESIGN.tagHeight, DESIGN.tagRadius);
+    ctx.roundRect(tx, DESIGN.tagY, tw, DESIGN.tagHeight, DESIGN.tagRadius);
     ctx.fill();
 
-    ctx.fillStyle = t.tagText;
-    ctx.fillText(
-      tag,
-      tx + DESIGN.tagPaddingX,
-      tagY + (DESIGN.tagHeight - DESIGN.tagFontSize) / 2
-    );
+    ctx.fillStyle = DESIGN.tagTextColor || t.tagText;
+    ctx.textBaseline = "middle";
+    ctx.fillText(tag, tx + DESIGN.tagPaddingX, DESIGN.tagY + DESIGN.tagHeight / 2 + 1);
+    ctx.textBaseline = "top";
     tx += tw + DESIGN.tagGap;
   });
+  setSpacing(0);
 
-const catchcopy = "”" + (fields.catchcopy.value || "キャッチコピー") + "”";
-let catchcopySize = DESIGN.catchcopyFontSize;
-
-while (
-  catchcopySize > DESIGN.catchcopyMinFontSize &&
-  (() => {
+  // ---- キャッチコピー：横幅に合わせて自動縮小 ----
+  const catchcopy = "“" + (fields.catchcopy.value || "キャッチコピー") + "”";
+  let catchcopySize = DESIGN.catchcopyFontSize;
+  setSpacing(DESIGN.catchcopyLetterSpacing);
+  while (catchcopySize > DESIGN.catchcopyMinFontSize) {
     ctx.font = `700 ${catchcopySize}px ${DESIGN.fontFamily}`;
-    return ctx.measureText(catchcopy).width > DESIGN.catchcopyMaxWidth;
-  })()
-) {
-  catchcopySize -= 1;
-}
+    if (ctx.measureText(catchcopy).width <= DESIGN.catchcopyMaxWidth) break;
+    catchcopySize -= 1;
+  }
+  ctx.fillStyle = t.accent;
+  ctx.font = `700 ${catchcopySize}px ${DESIGN.fontFamily}`;
+  ctx.fillText(catchcopy, x, DESIGN.catchcopyY);
+  setSpacing(0);
 
-ctx.fillStyle = t.accent;
-ctx.font = `700 ${catchcopySize}px ${DESIGN.fontFamily}`;
-ctx.fillText(
-  catchcopy,
-  x,
-  DESIGN.catchcopyY
-);
-
-// QRコード
-if (uploadedQr) {
-    ctx.drawImage(
-    uploadedQr,
-    DESIGN.qrX,
-    DESIGN.qrY,
-    DESIGN.qrSize,
-    DESIGN.qrSize
-  );
-}
-
+  // ---- QRコード ----
+  if (uploadedQr) {
+    ctx.drawImage(uploadedQr, DESIGN.qrX, DESIGN.qrY, DESIGN.qrSize, DESIGN.qrSize);
+  }
 }
 
 
@@ -528,6 +571,7 @@ qrInput.addEventListener("change", () => {
 
     img.onload = () => {
       uploadedQr = img;
+      removeQr.disabled = false;
       status.textContent = "QRコードを読み込みました。";
       render();
     };
@@ -540,6 +584,14 @@ qrInput.addEventListener("change", () => {
   };
 
   reader.readAsDataURL(file);
+});
+
+removeQr.addEventListener("click", () => {
+  uploadedQr = null;
+  qrInput.value = ""; // 同じファイルをもう一度選べるようにリセット
+  removeQr.disabled = true;
+  status.textContent = "QRコードを外しました。";
+  render();
 });
 
 function updateImageLabels() {
@@ -652,3 +704,11 @@ downloadButton.addEventListener("click", () => {
 
 updateImageLabels();
 render();
+
+// Webフォントの読み込み完了後に描き直す（未読込のままだと代替フォントで描画されてしまうため）
+if (document.fonts && document.fonts.load) {
+  const weights = [400, 600, 700];
+  Promise.all(weights.map(w => document.fonts.load(`${w} 20px 'Shippori Mincho B1'`, "あA")))
+    .catch(() => {})
+    .finally(render);
+}

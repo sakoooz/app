@@ -145,3 +145,12 @@ canvas {
   color: #eee;
   border: 1px solid #505050;
 }
+
+.qr-remove {
+  margin: -4px 0 15px;
+}
+
+button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
