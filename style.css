@@ -132,8 +132,8 @@ main { display: grid; gap: 18px; }
   font-size: 11px;
   font-weight: 800;
 }
-.section-heading h2 { margin: 0; font-size: 19px; letter-spacing: .025em; }
-.section-heading h2::after {
+.section-heading h2, .section-heading h3 { margin: 0; font-size: 19px; letter-spacing: .025em; }
+.section-heading h2::after, .section-heading h3::after {
   content: "";
   display: block;
   width: 36px;
@@ -393,4 +393,111 @@ input:focus, textarea:focus {
   }
   .toolbar-panel .toolbar-status { flex: 1 1 auto; }
   .toolbar-panel .toolbar-actions { width: auto; }
+}
+
+
+/* ===== 恋愛チャット設計シート：キャラクターのアコーディオン ===== */
+.characters { display: grid; gap: 14px; }
+.character-list { display: grid; gap: 14px; }
+
+.character-card {
+  min-width: 0;
+  border: 1px solid rgba(229, 232, 225, .95);
+  border-radius: var(--radius-card);
+  background: var(--color-paper);
+  box-shadow: var(--shadow-card);
+}
+.character-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px clamp(14px, 2.5vw, 24px);
+  list-style: none;
+  cursor: pointer;
+  border-radius: var(--radius-card);
+  user-select: none;
+}
+.character-summary::-webkit-details-marker { display: none; }
+.character-summary:focus-visible { outline: 3px solid var(--color-focus); outline-offset: -3px; }
+.character-card[open] > .character-summary {
+  border-bottom: 1px solid var(--color-line);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.character-badge {
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  color: #fff;
+  background: var(--color-primary);
+  font-size: 13px;
+  font-weight: 800;
+}
+.character-summary-text { display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0; }
+.character-summary-label { color: var(--color-muted); font-size: 10px; font-weight: 800; letter-spacing: .12em; }
+.character-summary-name {
+  font-size: 17px;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.character-delete {
+  flex: 0 0 auto;
+  padding: 7px 11px;
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  color: #8b5c51;
+  background: var(--color-paper);
+  font-size: 12px;
+  font-weight: 700;
+}
+.character-delete:hover:not(:disabled) { background: #f7f8f4; }
+.character-delete:disabled { opacity: .35; cursor: not-allowed; }
+.character-chevron {
+  flex: 0 0 10px;
+  width: 10px;
+  height: 10px;
+  margin: 0 4px 3px 2px;
+  border-right: 2px solid var(--color-muted);
+  border-bottom: 2px solid var(--color-muted);
+  transform: rotate(45deg);
+  transition: transform .18s ease;
+}
+.character-card[open] .character-chevron { transform: rotate(-135deg); margin-bottom: -3px; }
+
+.character-body {
+  display: grid;
+  gap: 14px;
+  padding: clamp(12px, 2vw, 20px);
+}
+.character-body .panel {
+  background: #fcfcfa;
+  box-shadow: none;
+}
+.character-body .field input,
+.character-body .field textarea { background: #fff; }
+.character-body .stage-field { background: #fff; }
+
+.add-character {
+  width: 100%;
+  min-height: 52px;
+  border: 2px dashed #c9d6b8;
+  border-radius: var(--radius-card);
+  color: var(--color-primary-dark);
+  background: rgba(255, 255, 255, .6);
+  font-size: 14px;
+  font-weight: 800;
+  transition: background .15s ease, border-color .15s ease;
+}
+.add-character:hover { background: #fff; border-color: var(--color-primary); }
+
+@media (max-width: 720px) {
+  .character-summary { padding: 13px 12px; gap: 10px; }
+  .character-summary-name { font-size: 15px; }
+  .character-body { padding: 10px; }
+  .character-body .panel { padding: 16px 13px; }
 }
