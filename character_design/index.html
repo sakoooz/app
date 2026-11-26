@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#638c2b">
-  <title>恋愛キャラクター設計シート</title>
+  <title>恋愛チャット設計シート</title>
   <link rel="stylesheet" href="../style.css">
   <link rel="icon" href="../assets/apple-touch-icon.png" sizes="any">
 <link rel="icon" type="image/png" href="../assets/favicon.png">
@@ -15,22 +15,22 @@
     <header class="app-header">
       <div class="brand-mark" aria-hidden="true">♡</div>
       <div class="header-copy">
-        <p class="eyebrow">CHARACTER DESIGN WORKSHEET</p>
-        <h1>恋愛キャラクター設計シート</h1>
+        <p class="eyebrow">CHAT DESIGN WORKSHEET</p>
+        <h1>恋愛チャット設計シート</h1>
         <p class="header-description">思いついたことから、自由に書き留める。</p>
       </div>
     </header>
 
     <button type="button" class="toolbar-toggle" id="toolbar-toggle"
-      aria-label="キャラクター操作を開く" aria-expanded="false" aria-controls="sheet-toolbar">
+      aria-label="タイトル操作を開く" aria-expanded="false" aria-controls="sheet-toolbar">
       <span class="toolbar-toggle-icon" aria-hidden="true">↗</span>
     </button>
 
     <div class="toolbar toolbar-panel" id="sheet-toolbar" aria-label="シート操作" aria-hidden="true">
-      <div class="character-manager" aria-label="キャラクター管理"><label class="character-select-label" for="character-select">保存済みキャラクター</label><select id="character-select" aria-label="編集するキャラクターを選択"></select><span id="character-count" class="character-count"></span></div>
+      <div class="character-manager" aria-label="タイトル管理"><label class="character-select-label" for="character-select">保存済みタイトル</label><select id="character-select" aria-label="編集するタイトルを選択"></select><span id="character-count" class="character-count"></span></div>
       <div class="toolbar-status" id="save-status" aria-live="polite">このブラウザに自動保存します</div>
       <div class="toolbar-actions">
-        <button type="button" class="button button-soft" id="new-sheet">新規キャラクター</button>
+        <button type="button" class="button button-soft" id="new-sheet">新規タイトル</button>
         <button type="button" class="button button-soft" id="duplicate-character">複製</button>
         <button type="button" class="button button-soft" id="delete-character">削除</button>
         <button type="button" class="button button-soft" id="import-json">JSON読み込み</button>
@@ -42,6 +42,7 @@
     </div>
 
     <main>
+      <!-- 01 プロット（タイトル全体で共通） -->
       <section class="panel plot-panel" aria-labelledby="plot-heading">
         <div class="section-heading">
           <span class="section-number">01</span>
@@ -60,117 +61,17 @@
             <span class="field-label">あらすじ</span>
             <textarea data-field="synopsis" rows="4" placeholder="物語のあらすじ"></textarea>
           </label>
+          <label class="field field-wide">
+            <span class="field-label">関係性</span>
+            <textarea data-field="relationship" rows="4" placeholder="登場人物同士、またはユーザーとの関係性"></textarea>
+          </label>
         </div>
       </section>
 
-      <section class="panel" aria-labelledby="basic-heading">
-        <div class="section-heading">
-          <span class="section-number">02</span>
-          <h2 id="basic-heading">基本情報</h2>
-        </div>
-        <div class="field-grid compact-grid">
-          <label class="field"><span class="field-label">名前</span><input data-field="name" type="text" placeholder="キャラクター名"></label>
-          <label class="field"><span class="field-label">年齢</span><input data-field="age" type="text" placeholder="年齢"></label>
-          <label class="field"><span class="field-label">性別</span><input data-field="gender" type="text" placeholder="性別"></label>
-          <label class="field"><span class="field-label">種族</span><input data-field="species" type="text" placeholder="種族"></label>
-          <label class="field"><span class="field-label">身長</span><input data-field="height" type="text" placeholder="身長"></label>
-          <label class="field"><span class="field-label">体格</span><input data-field="build" type="text" placeholder="体格"></label>
-          <label class="field"><span class="field-label">職業</span><input data-field="occupation" type="text" placeholder="職業"></label>
-          <label class="field"><span class="field-label">住居</span><input data-field="residence" type="text" placeholder="住居"></label>
-          <label class="field"><span class="field-label">外見</span><textarea data-field="appearance" rows="2" placeholder="外見の特徴"></textarea></label>
-          <label class="field"><span class="field-label">アクセサリー</span><textarea data-field="accessories" rows="2" placeholder="身につけているもの"></textarea></label>
-          <label class="field"><span class="field-label">服装</span><textarea data-field="clothing" rows="2" placeholder="服装"></textarea></label>
-          <label class="field"><span class="field-label">雰囲気</span><textarea data-field="vibe" rows="2" placeholder="全体的な雰囲気"></textarea></label>
-          <label class="field"><span class="field-label">好き</span><textarea data-field="likes" rows="2" placeholder="好きなもの・こと"></textarea></label>
-          <label class="field"><span class="field-label">嫌い</span><textarea data-field="dislikes" rows="2" placeholder="嫌いなもの・こと"></textarea></label>
-        </div>
-      </section>
-
-      <section class="panel" aria-labelledby="speech-heading">
-        <div class="section-heading">
-          <span class="section-number">03</span>
-          <h2 id="speech-heading">話し方</h2>
-        </div>
-        <div class="field-grid">
-          <label class="field"><span class="field-label">一人称</span><input data-field="firstPerson" type="text" placeholder="例：俺"></label>
-          <label class="field"><span class="field-label">二人称</span><input data-field="secondPerson" type="text" placeholder="例：お前"></label>
-          <label class="field field-wide"><span class="field-label">口調</span><textarea data-field="speechStyle" rows="3" placeholder="声や話し方、言葉選びなど"></textarea></label>
-        </div>
-      </section>
-
-      <section class="panel" aria-labelledby="personal-heading">
-        <div class="section-heading">
-          <span class="section-number">04</span>
-          <h2 id="personal-heading">パーソナルデータ</h2>
-        </div>
-        <div class="field-grid compact-grid">
-          <label class="field"><span class="field-label">星座</span><input data-field="zodiac" type="text" placeholder="星座"></label>
-          <label class="field"><span class="field-label">誕生日</span><input data-field="birthday" type="text" placeholder="誕生日"></label>
-          <label class="field"><span class="field-label">誕生花</span><input data-field="birthFlower" type="text" placeholder="誕生花"></label>
-          <label class="field"><span class="field-label">花言葉</span><input data-field="flowerLanguage" type="text" placeholder="花言葉"></label>
-          <label class="field"><span class="field-label">血液型</span><input data-field="bloodType" type="text" placeholder="血液型"></label>
-          <label class="field"><span class="field-label">MBTI</span><input data-field="mbti" type="text" placeholder="MBTI"></label>
-          <label class="field"><span class="field-label">DSKB</span><input data-field="dskb" type="text" placeholder="DSKB"></label>
-          <label class="field"><span class="field-label">イメージ色</span><input data-field="imageColor" type="text" placeholder="色・カラーコードなど"></label>
-        </div>
-      </section>
-
-      <section class="panel" aria-labelledby="core-heading">
-        <div class="section-heading">
-          <span class="section-number">05</span>
-          <h2 id="core-heading">メロさの核</h2>
-        </div>
-        <label class="field"><span class="field-label">このキャラクターの魅力の核心</span><textarea data-field="meltyCore" rows="5" placeholder="恋愛に限らず、このキャラクターの心を掴むところを自由に"></textarea></label>
-      </section>
-
-      <section class="panel" aria-labelledby="personality-heading">
-        <div class="section-heading">
-          <span class="section-number">06</span>
-          <h2 id="personality-heading">基本性格</h2>
-        </div>
-        <label class="field"><span class="field-label">性格・人格</span><textarea data-field="personality" rows="5" placeholder="長所、短所、矛盾、他人に見せる顔など"></textarea></label>
-      </section>
-
-      <section class="panel" aria-labelledby="action-heading">
-        <div class="section-heading">
-          <span class="section-number">07</span>
-          <h2 id="action-heading">行動</h2>
-        </div>
-        <label class="field"><span class="field-label">振る舞い・行動パターン</span><textarea data-field="actions" rows="5" placeholder="普段の振る舞い、癖、具体的な行動など"></textarea></label>
-      </section>
-
-      <section class="panel" aria-labelledby="romance-heading">
-        <div class="section-heading">
-          <span class="section-number">08</span>
-          <h2 id="romance-heading">恋愛傾向</h2>
-        </div>
-        <label class="field"><span class="field-label">恋愛観・愛情表現</span><textarea data-field="romance" rows="5" placeholder="愛情表現、嫉妬、独占欲、依存、恋愛観など"></textarea></label>
-      </section>
-
-      <section class="panel" aria-labelledby="stages-heading">
-        <div class="section-heading">
-          <span class="section-number">09</span>
-          <h2 id="stages-heading">関係性の段階的変化</h2>
-        </div>
-        <div class="stage-grid">
-          <label class="field stage-field"><span class="field-label"><span class="stage-dot">1</span>初期</span><textarea data-field="stageInitial" rows="4" placeholder="出会い・警戒・第一印象など"></textarea></label>
-          <label class="field stage-field"><span class="field-label"><span class="stage-dot">2</span>中期</span><textarea data-field="stageMiddle" rows="4" placeholder="距離が縮まる・感情の変化など"></textarea></label>
-          <label class="field stage-field"><span class="field-label"><span class="stage-dot">3</span>末期</span><textarea data-field="stageLate" rows="4" placeholder="執着・決定的な変化など"></textarea></label>
-          <label class="field stage-field"><span class="field-label"><span class="stage-dot">4</span>付き合ってから</span><textarea data-field="stageDating" rows="4" placeholder="恋人になった後の態度・愛情表現など"></textarea></label>
-        </div>
-      </section>
-
-      <section class="panel" aria-labelledby="principles-heading">
-        <div class="section-heading">
-          <span class="section-number">10</span>
-          <h2 id="principles-heading">行動原理</h2>
-        </div>
-        <div class="field-grid">
-          <label class="field"><span class="field-label">過去</span><textarea data-field="past" rows="4" placeholder="人格形成につながった経験など"></textarea></label>
-          <label class="field"><span class="field-label">秘密</span><textarea data-field="secret" rows="4" placeholder="隠している事実、知られたくないことなど"></textarea></label>
-          <label class="field"><span class="field-label">価値観</span><textarea data-field="values" rows="4" placeholder="信念、譲れないもの、善悪の基準など"></textarea></label>
-          <label class="field"><span class="field-label">深層心理</span><textarea data-field="subconscious" rows="4" placeholder="本人も自覚していない欲求、恐れ、矛盾など"></textarea></label>
-        </div>
+      <!-- 02〜10 はキャラクターごと（アコーディオン） -->
+      <section class="characters" aria-label="キャラクター">
+        <div class="character-list" id="character-list"></div>
+        <button type="button" class="add-character" id="add-character">＋ キャラクターを追加</button>
       </section>
 
       <section class="panel" aria-labelledby="avoid-heading">
@@ -184,37 +85,172 @@
 
     <footer class="app-footer">
       <p>入力内容はこのブラウザ内に保存されます。大切なデータはJSONでもバックアップしてください。</p>
-      <button type="button" class="text-button" id="clear-sheet">このシートの入力をすべて消去</button>
+      <button type="button" class="text-button" id="clear-sheet">このタイトルの入力をすべて消去</button>
     </footer>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </div>
+
+  <template id="character-template">
+    <details class="character-card" open>
+      <summary class="character-summary">
+        <span class="character-badge" data-role="badge">1</span>
+        <span class="character-summary-text">
+          <span class="character-summary-label">CHARACTER</span>
+          <span class="character-summary-name" data-role="name-preview">名前未設定</span>
+        </span>
+        <button type="button" class="character-delete" data-role="delete">削除</button>
+        <span class="character-chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="character-body">
+
+        <section class="panel">
+          <div class="section-heading">
+            <span class="section-number">02</span>
+            <h3>基本情報</h3>
+          </div>
+          <div class="field-grid compact-grid">
+            <label class="field"><span class="field-label">名前</span><input data-cfield="name" type="text" placeholder="キャラクター名"></label>
+            <label class="field"><span class="field-label">年齢</span><input data-cfield="age" type="text" placeholder="年齢"></label>
+            <label class="field"><span class="field-label">性別</span><input data-cfield="gender" type="text" placeholder="性別"></label>
+            <label class="field"><span class="field-label">種族</span><input data-cfield="species" type="text" placeholder="種族"></label>
+            <label class="field"><span class="field-label">身長</span><input data-cfield="height" type="text" placeholder="身長"></label>
+            <label class="field"><span class="field-label">体格</span><input data-cfield="build" type="text" placeholder="体格"></label>
+            <label class="field"><span class="field-label">職業</span><input data-cfield="occupation" type="text" placeholder="職業"></label>
+            <label class="field"><span class="field-label">住居</span><input data-cfield="residence" type="text" placeholder="住居"></label>
+            <label class="field"><span class="field-label">外見</span><textarea data-cfield="appearance" rows="2" placeholder="外見の特徴"></textarea></label>
+            <label class="field"><span class="field-label">アクセサリー</span><textarea data-cfield="accessories" rows="2" placeholder="身につけているもの"></textarea></label>
+            <label class="field"><span class="field-label">服装</span><textarea data-cfield="clothing" rows="2" placeholder="服装"></textarea></label>
+            <label class="field"><span class="field-label">雰囲気</span><textarea data-cfield="vibe" rows="2" placeholder="全体的な雰囲気"></textarea></label>
+            <label class="field"><span class="field-label">好き</span><textarea data-cfield="likes" rows="2" placeholder="好きなもの・こと"></textarea></label>
+            <label class="field"><span class="field-label">嫌い</span><textarea data-cfield="dislikes" rows="2" placeholder="嫌いなもの・こと"></textarea></label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <span class="section-number">03</span>
+            <h3>話し方</h3>
+          </div>
+          <div class="field-grid">
+            <label class="field"><span class="field-label">一人称</span><input data-cfield="firstPerson" type="text" placeholder="例：俺"></label>
+            <label class="field"><span class="field-label">二人称</span><input data-cfield="secondPerson" type="text" placeholder="例：お前"></label>
+            <label class="field field-wide"><span class="field-label">口調</span><textarea data-cfield="speechStyle" rows="3" placeholder="声や話し方、言葉選びなど"></textarea></label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <span class="section-number">04</span>
+            <h3>パーソナルデータ</h3>
+          </div>
+          <div class="field-grid compact-grid">
+            <label class="field"><span class="field-label">星座</span><input data-cfield="zodiac" type="text" placeholder="星座"></label>
+            <label class="field"><span class="field-label">誕生日</span><input data-cfield="birthday" type="text" placeholder="誕生日"></label>
+            <label class="field"><span class="field-label">誕生花</span><input data-cfield="birthFlower" type="text" placeholder="誕生花"></label>
+            <label class="field"><span class="field-label">花言葉</span><input data-cfield="flowerLanguage" type="text" placeholder="花言葉"></label>
+            <label class="field"><span class="field-label">血液型</span><input data-cfield="bloodType" type="text" placeholder="血液型"></label>
+            <label class="field"><span class="field-label">MBTI</span><input data-cfield="mbti" type="text" placeholder="MBTI"></label>
+            <label class="field"><span class="field-label">DSKB</span><input data-cfield="dskb" type="text" placeholder="DSKB"></label>
+            <label class="field"><span class="field-label">イメージ色</span><input data-cfield="imageColor" type="text" placeholder="色・カラーコードなど"></label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <span class="section-number">05</span>
+            <h3>メロさの核</h3>
+          </div>
+          <label class="field"><span class="field-label">このキャラクターの魅力の核心</span><textarea data-cfield="meltyCore" rows="5" placeholder="恋愛に限らず、このキャラクターの心を掴むところを自由に"></textarea></label>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <span class="section-number">06</span>
+            <h3>基本性格</h3>
+          </div>
+          <label class="field"><span class="field-label">性格・人格</span><textarea data-cfield="personality" rows="5" placeholder="長所、短所、矛盾、他人に見せる顔など"></textarea></label>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <span class="section-number">07</span>
+            <h3>行動</h3>
+          </div>
+          <label class="field"><span class="field-label">振る舞い・行動パターン</span><textarea data-cfield="actions" rows="5" placeholder="普段の振る舞い、癖、具体的な行動など"></textarea></label>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <span class="section-number">08</span>
+            <h3>恋愛傾向</h3>
+          </div>
+          <label class="field"><span class="field-label">恋愛観・愛情表現</span><textarea data-cfield="romance" rows="5" placeholder="愛情表現、嫉妬、独占欲、依存、恋愛観など"></textarea></label>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <span class="section-number">09</span>
+            <h3>関係性の段階的変化</h3>
+          </div>
+          <div class="stage-grid">
+            <label class="field stage-field"><span class="field-label"><span class="stage-dot">1</span>初期</span><textarea data-cfield="stageInitial" rows="4" placeholder="出会い・警戒・第一印象など"></textarea></label>
+            <label class="field stage-field"><span class="field-label"><span class="stage-dot">2</span>中期</span><textarea data-cfield="stageMiddle" rows="4" placeholder="距離が縮まる・感情の変化など"></textarea></label>
+            <label class="field stage-field"><span class="field-label"><span class="stage-dot">3</span>末期</span><textarea data-cfield="stageLate" rows="4" placeholder="執着・決定的な変化など"></textarea></label>
+            <label class="field stage-field"><span class="field-label"><span class="stage-dot">4</span>付き合ってから</span><textarea data-cfield="stageDating" rows="4" placeholder="恋人になった後の態度・愛情表現など"></textarea></label>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="section-heading">
+            <span class="section-number">10</span>
+            <h3>行動原理</h3>
+          </div>
+          <div class="field-grid">
+            <label class="field"><span class="field-label">過去</span><textarea data-cfield="past" rows="4" placeholder="人格形成につながった経験など"></textarea></label>
+            <label class="field"><span class="field-label">秘密</span><textarea data-cfield="secret" rows="4" placeholder="隠している事実、知られたくないことなど"></textarea></label>
+            <label class="field"><span class="field-label">価値観</span><textarea data-cfield="values" rows="4" placeholder="信念、譲れないもの、善悪の基準など"></textarea></label>
+            <label class="field"><span class="field-label">深層心理</span><textarea data-cfield="subconscious" rows="4" placeholder="本人も自覚していない欲求、恐れ、矛盾など"></textarea></label>
+          </div>
+        </section>
+
+      </div>
+    </details>
+  </template>
+
   <script>
-/* 恋愛キャラクター設計シート専用スクリプト：複数キャラクター保存版 */
+/* 恋愛チャット設計シート専用スクリプト：タイトル（作品）ごとに複数キャラクターを保存 */
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "renaiCharacterDesignSheet.multi.v2";
+  const STORAGE_KEY = "renaiChatDesignSheet.v3";
+  const OLD_KEY_V2 = "renaiCharacterDesignSheet.multi.v2"; // 旧：キャラクター単位の保存
+  const OLD_KEY_V1 = "renaiCharacterDesignSheet.v1";
+  const VERSION = 3;
 
-  const toolbarToggle = document.getElementById("toolbar-toggle");
+  /* ---------- 要素 ---------- */
+  const $ = (id) => document.getElementById(id);
+  const toolbarToggle = $("toolbar-toggle");
   const toolbarToggleIcon = toolbarToggle.querySelector(".toolbar-toggle-icon");
-  const toolbarPanel = document.getElementById("sheet-toolbar");
+  const toolbarPanel = $("sheet-toolbar");
+  const status = $("save-status");
+  const toast = $("toast");
+  const jsonFile = $("json-file");
+  const titleSelect = $("character-select");
+  const titleCount = $("character-count");
+  const characterList = $("character-list");
+  const characterTemplate = $("character-template");
+  const plotFields = Array.from(document.querySelectorAll("[data-field]"));
 
+  /* ---------- ツールバー開閉 ---------- */
   function setToolbarOpen(open) {
     toolbarPanel.classList.toggle("is-open", open);
     toolbarPanel.setAttribute("aria-hidden", String(!open));
     toolbarToggle.setAttribute("aria-expanded", String(open));
-    toolbarToggle.setAttribute("aria-label", open ? "キャラクター操作を閉じる" : "キャラクター操作を開く");
+    toolbarToggle.setAttribute("aria-label", open ? "タイトル操作を閉じる" : "タイトル操作を開く");
     toolbarToggleIcon.textContent = open ? "×" : "↗";
   }
-
-  toolbarToggle.addEventListener("click", () => {
-    setToolbarOpen(!toolbarPanel.classList.contains("is-open"));
-  });
-
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") setToolbarOpen(false);
-  });
-
+  toolbarToggle.addEventListener("click", () => setToolbarOpen(!toolbarPanel.classList.contains("is-open")));
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape") setToolbarOpen(false); });
   document.addEventListener("click", (event) => {
     if (!toolbarPanel.classList.contains("is-open")) return;
     const path = event.composedPath();
@@ -222,21 +258,16 @@
     setToolbarOpen(false);
   });
 
-  const VERSION = 2;
-  const formFields = Array.from(document.querySelectorAll("[data-field]"));
-  const status = document.getElementById("save-status");
-  const toast = document.getElementById("toast");
-  const jsonFile = document.getElementById("json-file");
-  const characterSelect = document.getElementById("character-select");
-  const characterCount = document.getElementById("character-count");
-  let saveTimer = null;
-  let toastTimer = null;
-  let activeId = null;
-  let store = { activeId: null, characters: [] };
-  let isSwitching = false;
+  /* ---------- 項目定義 ---------- */
+  // タイトル（作品）共通の項目
+  const PLOT_KEYS = ["title", "catchcopy", "synopsis", "relationship", "avoid"];
+  const plotGroup = { heading: "プロット", fields: [
+    ["title", "タイトル"], ["catchcopy", "キャッチコピー"], ["synopsis", "あらすじ"], ["relationship", "関係性"]
+  ]};
+  const avoidGroup = { heading: "避けたい傾向", fields: [["avoid", "避けたい傾向"]] };
 
-  const groups = [
-    { heading: "プロット", fields: [["title", "タイトル"], ["catchcopy", "キャッチコピー"], ["synopsis", "あらすじ"]] },
+  // キャラクターごとの項目（02〜10）
+  const characterGroups = [
     { heading: "基本情報", fields: [
       ["name", "名前"], ["age", "年齢"], ["gender", "性別"], ["species", "種族"],
       ["height", "身長"], ["build", "体格"], ["occupation", "職業"], ["residence", "住居"],
@@ -255,60 +286,54 @@
     { heading: "関係性の段階的変化", fields: [
       ["stageInitial", "初期"], ["stageMiddle", "中期"], ["stageLate", "末期"], ["stageDating", "付き合ってから"]
     ]},
-    { heading: "行動原理", fields: [["past", "過去"], ["secret", "秘密"], ["values", "価値観"], ["subconscious", "深層心理"]] },
-    { heading: "避けたい傾向", fields: [["avoid", "避けたい傾向"]] }
+    { heading: "行動原理", fields: [["past", "過去"], ["secret", "秘密"], ["values", "価値観"], ["subconscious", "深層心理"]] }
   ];
+  const CHARACTER_KEYS = characterGroups.flatMap((group) => group.fields.map(([key]) => key));
 
-  function uid() {
-    return "char-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+  /* ---------- 状態 ---------- */
+  let store = { activeId: null, titles: [] };
+  let activeId = null;
+  let saveTimer = null;
+  let toastTimer = null;
+  let rendering = false;
+
+  /* ---------- ユーティリティ ---------- */
+  function uid(prefix) {
+    return prefix + "-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+  }
+  function nowISO() { return new Date().toISOString(); }
+  function str(value) { return typeof value === "string" ? value : (value == null ? "" : String(value)); }
+
+  function newCharacter(data) { return { id: uid("char"), open: true, data: { ...(data || {}) } }; }
+  function newTitle(data, characters) {
+    return {
+      id: uid("title"), createdAt: nowISO(), updatedAt: nowISO(),
+      data: { ...(data || {}) },
+      characters: characters && characters.length ? characters : [newCharacter()]
+    };
   }
 
-  function readForm() {
-    const data = {};
-    formFields.forEach((field) => { data[field.dataset.field] = field.value; });
-    return data;
-  }
-
-  function writeForm(data) {
-    isSwitching = true;
-    formFields.forEach((field) => {
-      const value = data && Object.prototype.hasOwnProperty.call(data, field.dataset.field)
-        ? data[field.dataset.field] : "";
-      field.value = typeof value === "string" ? value : (value == null ? "" : String(value));
+  // 旧フォーマット（1キャラ＝フラットなデータ）を タイトル共通 / キャラクター に分ける
+  function splitFlat(flat) {
+    const plot = {}, chara = {};
+    Object.keys(flat || {}).forEach((key) => {
+      if (PLOT_KEYS.includes(key)) plot[key] = str(flat[key]);
+      else if (CHARACTER_KEYS.includes(key)) chara[key] = str(flat[key]);
     });
-    isSwitching = false;
+    return { plot, chara };
   }
 
-  function currentCharacter() {
-    return store.characters.find((character) => character.id === activeId) || null;
-  }
+  function currentTitle() { return store.titles.find((item) => item.id === activeId) || null; }
 
-  function characterTitle(character) {
-    const data = character.data || {};
-    return (data.name || data.title || "").trim() || "名前未設定";
-  }
-
-  function updateSelector() {
-    const previous = activeId;
-    characterSelect.innerHTML = "";
-    store.characters.forEach((character) => {
-      const option = document.createElement("option");
-      option.value = character.id;
-      option.textContent = characterTitle(character);
-      characterSelect.appendChild(option);
-    });
-    if (activeId && store.characters.some((character) => character.id === activeId)) {
-      characterSelect.value = activeId;
-    } else if (store.characters.length) {
-      activeId = store.characters[0].id;
-      characterSelect.value = activeId;
-    }
-    characterCount.textContent = store.characters.length + (store.characters.length === 1 ? " 件保存中" : " 件保存中");
-    return previous;
+  function titleLabel(item) {
+    const data = item.data || {};
+    const own = str(data.title).trim();
+    if (own) return own;
+    const first = item.characters && item.characters[0] ? str(item.characters[0].data.name).trim() : "";
+    return first || "タイトル未設定";
   }
 
   function setStatus(message) { status.textContent = message; }
-
   function showToast(message) {
     toast.textContent = message;
     toast.classList.add("is-visible");
@@ -316,67 +341,124 @@
     toastTimer = setTimeout(() => toast.classList.remove("is-visible"), 2400);
   }
 
+  /* ---------- フォーム ⇔ データ ---------- */
+  function readPlot() {
+    const data = {};
+    plotFields.forEach((field) => { data[field.dataset.field] = field.value; });
+    return data;
+  }
+  function writePlot(data) {
+    plotFields.forEach((field) => {
+      field.value = data ? str(data[field.dataset.field]) : "";
+    });
+  }
+  function readCharacterEl(element) {
+    const data = {};
+    element.querySelectorAll("[data-cfield]").forEach((field) => { data[field.dataset.cfield] = field.value; });
+    return data;
+  }
+
+  // 画面の入力内容を現在のタイトルへ反映
+  function collectActive() {
+    const item = currentTitle();
+    if (!item) return;
+    item.data = readPlot();
+    item.characters.forEach((character) => {
+      const element = characterList.querySelector('[data-char-id="' + character.id + '"]');
+      if (!element) return;
+      character.data = readCharacterEl(element);
+      character.open = element.open;
+    });
+    item.updatedAt = nowISO();
+  }
+
+  /* ---------- キャラクター描画 ---------- */
+  function updatePreview(element) {
+    const nameField = element.querySelector('[data-cfield="name"]');
+    const name = nameField ? nameField.value.trim() : "";
+    element.querySelector('[data-role="name-preview"]').textContent = name || "名前未設定";
+  }
+
+  function renderCharacters() {
+    const item = currentTitle();
+    rendering = true;
+    characterList.innerHTML = "";
+    if (item) {
+      item.characters.forEach((character, index) => {
+        const fragment = characterTemplate.content.cloneNode(true);
+        const element = fragment.querySelector(".character-card");
+        element.dataset.charId = character.id;
+        element.open = character.open !== false;
+        element.querySelectorAll("[data-cfield]").forEach((field) => {
+          field.value = str(character.data[field.dataset.cfield]);
+        });
+        element.querySelector('[data-role="badge"]').textContent = String(index + 1);
+        element.querySelector('[data-role="delete"]').disabled = item.characters.length <= 1;
+        updatePreview(element);
+        characterList.appendChild(fragment);
+      });
+    }
+    // details の open 反映で発火する toggle イベントを無視するため、次のフレームまで保持
+    requestAnimationFrame(() => { rendering = false; });
+  }
+
+  /* ---------- 保存 ---------- */
+  function refreshSelector() {
+    titleSelect.innerHTML = "";
+    store.titles.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = titleLabel(item);
+      titleSelect.appendChild(option);
+    });
+    if (activeId) titleSelect.value = activeId;
+    titleCount.textContent = store.titles.length + " 件保存中";
+  }
+
   function persistStore() {
     try {
       store.activeId = activeId;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
       setStatus("自動保存済み · " + new Date().toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit" }));
-      updateSelector();
     } catch (error) {
       setStatus("保存できません。JSONでバックアップしてください");
     }
+    refreshSelector();
   }
 
   function saveActiveNow() {
-    const character = currentCharacter();
-    if (!character) return;
-    character.data = readForm();
-    character.updatedAt = new Date().toISOString();
+    collectActive();
     persistStore();
   }
-
   function scheduleSave() {
-    if (isSwitching) return;
+    if (rendering) return;
     setStatus("保存中…");
     clearTimeout(saveTimer);
     saveTimer = setTimeout(saveActiveNow, 250);
   }
-
   function saveActiveBeforeSwitch() {
     clearTimeout(saveTimer);
-    saveActiveNow();
+    if (currentTitle()) saveActiveNow();
   }
 
-  function loadCharacter(id) {
-    const character = store.characters.find((item) => item.id === id);
-    if (!character) return;
+  /* ---------- タイトルの切り替え・作成 ---------- */
+  function loadTitle(id) {
+    const item = store.titles.find((entry) => entry.id === id);
+    if (!item) return;
     activeId = id;
-    writeForm(character.data || {});
-    store.activeId = id;
-    updateSelector();
+    writePlot(item.data);
+    renderCharacters();
     persistStore();
-    setStatus("「" + characterTitle(character) + "」を編集中");
+    setStatus("「" + titleLabel(item) + "」を編集中");
   }
 
-  function createCharacter(data = {}, title = "") {
-    const character = {
-      id: uid(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      data: { ...data }
-    };
-    if (title && !character.data.name && !character.data.title) {
-      character.data.name = title;
-    }
-    store.characters.push(character);
-    activeId = character.id;
-    writeForm(character.data);
-    persistStore();
-    updateSelector();
+  function addTitle(item) {
+    store.titles.push(item);
+    loadTitle(item.id);
     window.scrollTo({ top: 0, behavior: "smooth" });
-    return character;
   }
 
+  /* ---------- 書き出し ---------- */
   function downloadFile(filename, content, mimeType) {
     const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
@@ -388,41 +470,62 @@
     anchor.remove();
     URL.revokeObjectURL(url);
   }
-
   function safeFilename(value) {
-    const cleaned = (value || "character-sheet").trim()
+    const cleaned = (value || "chat-sheet").trim()
       .replace(/[\\/:*?"<>|]/g, "-").replace(/\s+/g, "-").slice(0, 70);
-    return cleaned || "character-sheet";
+    return cleaned || "chat-sheet";
+  }
+  function fileBaseName(item) {
+    return safeFilename(titleLabel(item) === "タイトル未設定" ? "chat-sheet" : titleLabel(item));
   }
 
   function exportJSON() {
     saveActiveBeforeSwitch();
-    const character = currentCharacter();
+    const item = currentTitle();
+    if (!item) return;
     const payload = {
-      app: "恋愛キャラクター設計シート",
+      app: "恋愛チャット設計シート",
       version: VERSION,
-      exportedAt: new Date().toISOString(),
-      character: character ? { id: character.id, createdAt: character.createdAt, updatedAt: character.updatedAt } : null,
-      data: readForm()
+      exportedAt: nowISO(),
+      title: {
+        plot: item.data,
+        characters: item.characters.map((character) => character.data)
+      }
     };
-    const data = readForm();
-    downloadFile(safeFilename(data.name || data.title || "character-sheet") + ".json",
-      JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
-    showToast("このキャラクターをJSONで書き出しました");
+    downloadFile(fileBaseName(item) + ".json", JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
+    showToast("このタイトルをJSONで書き出しました");
+  }
+
+  function pushGroup(lines, group, data, headingPrefix) {
+    const populated = group.fields
+      .map(([key, label]) => ({ label, value: str(data[key]) }))
+      .filter((entry) => entry.value.trim() !== "");
+    if (!populated.length) return false;
+    if (lines.length) lines.push("");
+    lines.push(headingPrefix + group.heading);
+    populated.forEach((entry) => lines.push(entry.label + "：" + entry.value));
+    return true;
   }
 
   function buildMarkdown() {
-    const data = readForm();
+    collectActive();
+    const item = currentTitle();
+    if (!item) return "";
     const lines = [];
-    groups.forEach((group) => {
-      const populated = group.fields
-        .map(([key, label]) => ({ label, value: data[key] || "" }))
-        .filter((item) => item.value.trim() !== "");
-      if (!populated.length) return;
-      if (lines.length) lines.push("");
-      lines.push("# " + group.heading);
-      populated.forEach((item) => lines.push(item.label + "：" + item.value));
+    pushGroup(lines, plotGroup, item.data, "# ");
+    item.characters.forEach((character, index) => {
+      const name = str(character.data.name).trim();
+      const before = lines.length;
+      const heading = "# キャラクター" + (index + 1) + (name ? "：" + name : "");
+      const body = [];
+      characterGroups.forEach((group) => pushGroup(body, group, character.data, "## "));
+      if (!body.length) return;
+      if (before) lines.push("");
+      lines.push(heading);
+      // 先頭の空行を除いて追加
+      body.forEach((line, i) => { if (!(i === 0 && line === "")) lines.push(line); });
     });
+    pushGroup(lines, avoidGroup, item.data, "# ");
     return lines.join("\n");
   }
 
@@ -449,10 +552,25 @@
   function exportMarkdown() {
     const markdown = buildMarkdown();
     if (!markdown) { showToast("まだ入力内容がありません"); return; }
-    const data = readForm();
-    downloadFile(safeFilename(data.name || data.title || "character-sheet") + ".md",
-      markdown, "text/markdown;charset=utf-8");
+    downloadFile(fileBaseName(currentTitle()) + ".md", markdown, "text/markdown;charset=utf-8");
     showToast("Markdownファイルを書き出しました");
+  }
+
+  /* ---------- 読み込み ---------- */
+  function titleFromParsed(parsed) {
+    // v3：タイトル＋複数キャラクター
+    if (parsed && parsed.title && typeof parsed.title === "object" && Array.isArray(parsed.title.characters)) {
+      const plot = splitFlat(parsed.title.plot || {}).plot;
+      const characters = parsed.title.characters
+        .filter((entry) => entry && typeof entry === "object")
+        .map((entry) => newCharacter(splitFlat(entry).chara));
+      return newTitle(plot, characters);
+    }
+    // 旧形式：1キャラ分のフラットなデータ
+    const flat = parsed && parsed.data ? parsed.data : parsed;
+    if (!flat || typeof flat !== "object" || Array.isArray(flat)) throw new Error("Invalid JSON data");
+    const split = splitFlat(flat);
+    return newTitle(split.plot, [newCharacter(split.chara)]);
   }
 
   function importJSONFile(file) {
@@ -460,19 +578,16 @@
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        const parsed = JSON.parse(String(reader.result));
-        const data = parsed && parsed.data ? parsed.data : parsed;
-        if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error("Invalid JSON data");
-        const label = (data.name || data.title || "").trim();
+        const item = titleFromParsed(JSON.parse(String(reader.result)));
         const confirmed = window.confirm(
-          "JSONの内容を新しいキャラクターとして追加します。\n現在のキャラクターはそのまま保存されます。よろしいですか？"
+          "JSONの内容を新しいタイトルとして追加します。\n現在のタイトルはそのまま保存されます。よろしいですか？"
         );
         if (!confirmed) return;
         saveActiveBeforeSwitch();
-        const character = createCharacter(data, label);
-        showToast("JSONを新しいキャラクターとして読み込みました");
+        addTitle(item);
+        showToast("JSONを新しいタイトルとして読み込みました");
       } catch (error) {
-        window.alert("JSONを読み込めませんでした。恋愛キャラクター設計シートのJSONファイルを選んでください。");
+        window.alert("JSONを読み込めませんでした。恋愛チャット設計シート（または旧：恋愛キャラクター設計シート）のJSONファイルを選んでください。");
       } finally {
         jsonFile.value = "";
       }
@@ -481,124 +596,189 @@
     reader.readAsText(file, "utf-8");
   }
 
-  characterSelect.addEventListener("change", () => {
-    const nextId = characterSelect.value;
+  /* ---------- イベント：タイトル操作 ---------- */
+  titleSelect.addEventListener("change", () => {
+    const nextId = titleSelect.value;
     if (nextId === activeId) return;
     saveActiveBeforeSwitch();
-    loadCharacter(nextId);
-    showToast("キャラクターを切り替えました");
+    loadTitle(nextId);
+    showToast("タイトルを切り替えました");
   });
 
-  document.getElementById("new-sheet").addEventListener("click", () => {
+  $("new-sheet").addEventListener("click", () => {
     saveActiveBeforeSwitch();
-    createCharacter({});
-    showToast("新しいキャラクターを作成しました");
+    addTitle(newTitle());
+    showToast("新しいタイトルを作成しました");
   });
 
-  document.getElementById("duplicate-character").addEventListener("click", () => {
+  $("duplicate-character").addEventListener("click", () => {
     saveActiveBeforeSwitch();
-    const source = currentCharacter();
+    const source = currentTitle();
     if (!source) return;
-    const data = { ...source.data };
-    const oldName = (data.name || "").trim();
-    data.name = oldName ? oldName + "（コピー）" : "";
-    createCharacter(data);
-    showToast("キャラクターを複製しました");
+    const copy = newTitle(
+      { ...source.data },
+      source.characters.map((character) => newCharacter(character.data))
+    );
+    if (str(copy.data.title).trim()) {
+      copy.data.title = copy.data.title.trim() + "（コピー）";
+    } else if (str(copy.characters[0].data.name).trim()) {
+      copy.characters[0].data.name = copy.characters[0].data.name.trim() + "（コピー）";
+    }
+    addTitle(copy);
+    showToast("タイトルを複製しました");
   });
 
-  document.getElementById("delete-character").addEventListener("click", () => {
-    const character = currentCharacter();
-    if (!character) return;
-    const label = characterTitle(character);
-    if (!window.confirm("「" + label + "」を削除しますか？\nこの操作は元に戻せません。必要なら先にJSONを書き出してください。")) return;
+  $("delete-character").addEventListener("click", () => {
+    const item = currentTitle();
+    if (!item) return;
+    const label = titleLabel(item);
+    if (!window.confirm("「" + label + "」を削除しますか？\n登録されているキャラクターもすべて削除され、元に戻せません。必要なら先にJSONを書き出してください。")) return;
     clearTimeout(saveTimer);
-    store.characters = store.characters.filter((item) => item.id !== activeId);
-    if (store.characters.length) {
-      activeId = store.characters[0].id;
-      writeForm(store.characters[0].data || {});
-    } else {
-      const fresh = { id: uid(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), data: {} };
-      store.characters.push(fresh);
-      activeId = fresh.id;
-      writeForm({});
-    }
-    persistStore();
-    updateSelector();
+    store.titles = store.titles.filter((entry) => entry.id !== item.id);
+    if (!store.titles.length) store.titles.push(newTitle());
+    loadTitle(store.titles[0].id);
     showToast("「" + label + "」を削除しました");
   });
 
-  document.getElementById("export-json").addEventListener("click", exportJSON);
-  document.getElementById("copy-markdown").addEventListener("click", copyMarkdown);
-  document.getElementById("export-markdown").addEventListener("click", exportMarkdown);
-  document.getElementById("import-json").addEventListener("click", () => jsonFile.click());
+  $("export-json").addEventListener("click", exportJSON);
+  $("copy-markdown").addEventListener("click", copyMarkdown);
+  $("export-markdown").addEventListener("click", exportMarkdown);
+  $("import-json").addEventListener("click", () => jsonFile.click());
   jsonFile.addEventListener("change", () => importJSONFile(jsonFile.files && jsonFile.files[0]));
 
-  document.getElementById("clear-sheet").addEventListener("click", () => {
-    const character = currentCharacter();
-    if (!character) return;
-    if (!window.confirm("「" + characterTitle(character) + "」の入力をすべて消去します。この操作は元に戻せません。")) return;
-    writeForm({});
-    saveActiveNow();
+  $("clear-sheet").addEventListener("click", () => {
+    const item = currentTitle();
+    if (!item) return;
+    if (!window.confirm("「" + titleLabel(item) + "」の入力（キャラクターを含む）をすべて消去します。この操作は元に戻せません。")) return;
+    clearTimeout(saveTimer);
+    item.data = {};
+    item.characters = [newCharacter()];
+    writePlot({});
+    renderCharacters();
+    persistStore();
     window.scrollTo({ top: 0, behavior: "smooth" });
-    showToast("現在のキャラクターの入力を消去しました");
+    showToast("現在のタイトルの入力を消去しました");
   });
 
-  formFields.forEach((field) => {
-    field.addEventListener("input", scheduleSave);
-    // Update the selector label as soon as a name/title changes.
-    if (field.dataset.field === "name" || field.dataset.field === "title") {
-      field.addEventListener("input", () => {
-        const character = currentCharacter();
-        if (character) {
-          character.data = readForm();
-          updateSelector();
-          characterSelect.value = activeId;
-        }
-      });
+  /* ---------- イベント：キャラクター操作 ---------- */
+  $("add-character").addEventListener("click", () => {
+    const item = currentTitle();
+    if (!item) return;
+    collectActive();
+    const character = newCharacter();
+    item.characters.push(character);
+    renderCharacters();
+    persistStore();
+    const element = characterList.querySelector('[data-char-id="' + character.id + '"]');
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      const nameField = element.querySelector('[data-cfield="name"]');
+      if (nameField) nameField.focus({ preventScroll: true });
     }
+    showToast("キャラクターを追加しました");
   });
+
+  characterList.addEventListener("click", (event) => {
+    const button = event.target.closest('[data-role="delete"]');
+    if (!button) return;
+    event.preventDefault();      // summary の開閉を起こさない
+    event.stopPropagation();
+    const element = button.closest(".character-card");
+    const item = currentTitle();
+    if (!element || !item || item.characters.length <= 1) return;
+    collectActive();
+    const character = item.characters.find((entry) => entry.id === element.dataset.charId);
+    if (!character) return;
+    const name = str(character.data.name).trim() || "名前未設定";
+    if (!window.confirm("キャラクター「" + name + "」を削除しますか？\nこの操作は元に戻せません。")) return;
+    item.characters = item.characters.filter((entry) => entry.id !== character.id);
+    renderCharacters();
+    persistStore();
+    showToast("キャラクター「" + name + "」を削除しました");
+  });
+
+  // 開閉状態も保存（toggle はバブリングしないのでキャプチャで受ける）
+  characterList.addEventListener("toggle", scheduleSave, true);
+
+  /* ---------- イベント：入力 ---------- */
+  document.addEventListener("input", (event) => {
+    const field = event.target;
+    if (!field || !field.matches) return;
+    const isPlot = field.matches("[data-field]");
+    const isCharacter = field.matches("[data-cfield]");
+    if (!isPlot && !isCharacter) return;
+
+    if (isCharacter && field.dataset.cfield === "name") {
+      updatePreview(field.closest(".character-card"));
+    }
+    // タイトル欄・名前欄の変更を保存済みタイトルの表示へすぐ反映
+    if ((isPlot && field.dataset.field === "title") || (isCharacter && field.dataset.cfield === "name")) {
+      collectActive();
+      refreshSelector();
+    }
+    scheduleSave();
+  });
+
+  /* ---------- 初期化 ---------- */
+  function normalizeTitles(list) {
+    return list.filter((item) => item && typeof item === "object").map((item) => ({
+      id: item.id || uid("title"),
+      createdAt: item.createdAt || nowISO(),
+      updatedAt: item.updatedAt || nowISO(),
+      data: item.data && typeof item.data === "object" ? item.data : {},
+      characters: (Array.isArray(item.characters) && item.characters.length ? item.characters : [{}]).map((character) => ({
+        id: character.id || uid("char"),
+        open: character.open !== false,
+        data: character.data && typeof character.data === "object" ? character.data : {}
+      }))
+    }));
+  }
+
+  function readJSON(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (error) { return null; }
+  }
 
   function init() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && Array.isArray(parsed.characters) && parsed.characters.length) {
-          store = parsed;
+    const saved = readJSON(STORAGE_KEY);
+    if (saved && Array.isArray(saved.titles) && saved.titles.length) {
+      store = { activeId: saved.activeId, titles: normalizeTitles(saved.titles) };
+    }
+
+    // 旧バージョン（キャラクター単位の保存）から移行：1キャラ＝1タイトルとして取り込む
+    if (!store.titles.length) {
+      const old = readJSON(OLD_KEY_V2);
+      if (old && Array.isArray(old.characters) && old.characters.length) {
+        store.titles = old.characters.map((entry) => {
+          const split = splitFlat((entry && entry.data) || {});
+          const item = newTitle(split.plot, [newCharacter(split.chara)]);
+          if (entry.id) item.id = entry.id;
+          if (entry.createdAt) item.createdAt = entry.createdAt;
+          if (entry.updatedAt) item.updatedAt = entry.updatedAt;
+          return item;
+        });
+        store.activeId = old.activeId;
+      } else {
+        const v1 = readJSON(OLD_KEY_V1);
+        if (v1) {
+          const split = splitFlat(v1.data || v1);
+          store.titles = [newTitle(split.plot, [newCharacter(split.chara)])];
         }
       }
-    } catch (error) {
-      store = { activeId: null, characters: [] };
     }
+    if (!store.titles.length) store.titles = [newTitle()];
 
-    // Migrate data from the previous single-sheet versions when available.
-    if (!store.characters.length) {
-      let migrated = null;
-      for (const oldKey of ["renaiCharacterDesignSheet.v1"]) {
-        try {
-          const raw = localStorage.getItem(oldKey);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            migrated = parsed.data || parsed;
-            break;
-          }
-        } catch (error) { /* ignore invalid old data */ }
-      }
-      const first = { id: uid(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), data: migrated || {} };
-      store = { activeId: first.id, characters: [first] };
-    }
-
-    activeId = store.activeId && store.characters.some((item) => item.id === store.activeId)
-      ? store.activeId : store.characters[0].id;
-    const active = currentCharacter();
-    writeForm(active ? active.data : {});
-    updateSelector();
+    activeId = store.titles.some((item) => item.id === store.activeId) ? store.activeId : store.titles[0].id;
+    const active = currentTitle();
+    writePlot(active.data);
+    renderCharacters();
     persistStore();
   }
 
   init();
 })();
-
   </script>
 </body>
 </html>
